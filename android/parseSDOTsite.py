@@ -1,9 +1,14 @@
+import pickle
+import numpy as np
+import gmplot # you need to install this from the above link
+import matplotlib.pyplot as plt
 import urllib2
 import csv
+
 #python 2
-start_date = '01012015'
-end_date ='01072015'
-url = 'http://web6.seattle.gov/SDOT/wapiParkingStudy/api/ParkingTransaction?from='+start_date+'&to=' + end_date
+startDate = '01012015'
+endDate ='01072015'
+url = 'http://web6.seattle.gov/SDOT/wapiParkingStudy/api/ParkingTransaction?from='+startDate+'&to=' + endDate
 
 
 req = urllib2.urlopen(url)
@@ -22,9 +27,13 @@ csvFile = csv.reader(req)
 #Month (9)                           Text               The month of the transaction as recorded (derived from TransactionDateTime) 
 
 #creates a dictionary with DataId as a key,and the rest of the elements are in a list. 
-dictionary ={}
+transactions ={}
 headerFields = csvFile.next() #throwing header away
-for row in csvFile:
-   dictionary[row[0]] = [row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10]]
-print (dictionary)
 
+for row in csvFile:
+   transactions[row[0]] = [row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10]]
+fileName = 'transactionsFrom%sto%s' %(startDate,endDate)
+
+outputFile = open(fileName +'.pkl', 'wb')
+pickle.dump(transactions, outputFile)
+outputFile.close()
