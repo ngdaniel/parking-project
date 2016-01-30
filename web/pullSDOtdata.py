@@ -10,7 +10,6 @@ startDate = '01012015'
 endDate ='01072015'
 url = 'http://web6.seattle.gov/SDOT/wapiParkingStudy/api/ParkingTransaction?from='+startDate+'&to=' + endDate
 
-
 req = urllib2.urlopen(url)
 csvFile = csv.reader(req)
 
@@ -28,12 +27,10 @@ csvFile = csv.reader(req)
 
 #creates a dictionary with DataId as a key,and the rest of the elements are in a list. 
 transactions = {}
-keys = csvFile.next() #throwing header away
+keys = csvFile.next() 
 
-row_index = 0
 for row in csvFile:
     transactions[row[0]] = {keys[col_index]: row[col_index] for col_index in xrange(12)}
-    row_index += 1
     
 fileName = 'transactionsFrom%sto%s' %(startDate,endDate)
 
