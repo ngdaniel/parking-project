@@ -43,7 +43,7 @@ start_stops  = []
 for transaction in y:
     time = datetime.datetime.strptime(transaction['TransactionDateTime'], '%m/%d/%Y %H:%M:%S').strftime('%s')
     start_stops.append((int(time), True))
-    start_stops.append((int(time)+int(transaction['PaidDuration'])*60, False))
+    start_stops.append((int(time)+int(transaction['PaidDuration']), False))
 
 print start_stops
 start_stops.sort(key=lambda tup: tup[0])
