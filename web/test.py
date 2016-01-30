@@ -8,7 +8,6 @@ cross_reference_xls = xlrd.open_workbook('crossreferencesheet.xlsx').sheet_by_in
 keys = cross_reference_xls.row(0)
 for x in xrange(len(keys)):
     keys[x] = keys[x].value
-print keys
 cross_reference = {}
 meters = {} 
 for row_index in xrange(1, cross_reference_xls.nrows):
@@ -16,8 +15,6 @@ for row_index in xrange(1, cross_reference_xls.nrows):
          for col_index in xrange(cross_reference_xls.ncols)}
     meters[int(cross_reference_xls.cell(row_index, 5).value)] = d
 
-
-print meters
 
 locs = pickle.load(open('blockfacelocs.p','rb')) # load location data
 lats = []
@@ -28,5 +25,6 @@ for id in locs.keys():
     lons.append(locs[id][1])
 
 pickle.dump(locs, open('avgblockfacelocs.pickle', 'wb'))
+pickle.dump(meters, open('meters.pickle', 'wb'))
 gmap.heatmap(lats, lons)
 gmap.draw("index.html")

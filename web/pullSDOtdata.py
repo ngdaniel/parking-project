@@ -27,11 +27,14 @@ csvFile = csv.reader(req)
 #Month (9)                           Text               The month of the transaction as recorded (derived from TransactionDateTime) 
 
 #creates a dictionary with DataId as a key,and the rest of the elements are in a list. 
-transactions ={}
-headerFields = csvFile.next() #throwing header away
+transactions = {}
+keys = csvFile.next() #throwing header away
 
+row_index = 0
 for row in csvFile:
-   transactions[row[0]] = [row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10]]
+    transactions[row[0]] = {keys[col_index]: row[col_index] for col_index in xrange(12)}
+    row_index += 1
+    
 fileName = 'transactionsFrom%sto%s' %(startDate,endDate)
 
 outputFile = open(fileName +'.pkl', 'wb')
