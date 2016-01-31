@@ -1,4 +1,4 @@
-import pickle
+import marshal as pickle
 import gmplot 
 import xlrd
 import pprint
@@ -31,31 +31,31 @@ gmap.heatmap(lats, lons)
 gmap.draw("index.html")
 '''
 import datetime
-x = pickle.load(open('transactionsFrom01012015to01072015.pkl', 'rb'))
-y = []
+import os  
 keys = set([])
-for k, v in x.iteritems():
-    keys.add(v['ElementKey'])
-    if v['ElementKey'] == '119444':
-        y.append(v)
+d = {}
+data = {}
+for fn in os.listdir('2015data'):
+    print fn
+    x = pickle.load(open('2015data/' + fn, 'rb'))
+    for k, v in x.iteritems():
+        time = datetime.datetime.strptime(v['TransactionDateTime'], '%m/%d/%Y %H:%M:%S').strftime('%s')
+        keys.add(v['ElementKey'])
+        if not data.get(v['ElementKey']):
+            data[v['ElementKey']] = []
+        data[v['ElementKey']].append((int(time), True))
+        data[v['ElementKey']].append((int(time)+int(v['PaidDuration']), False))
+for k, v in data.iteritems():
+    start_stops = v 
+    start_stops.sort(key=lambda tup: tup[0])
+    maxOccupancy = 0
+    curr = 0
+    for tup in start_stops:
+        if tup[1]:
+            curr += 1
+            maxOccupancy = max([maxOccupancy, curr])
+        else:
+            curr -= 1
+    d[k] = maxOccupancy
 
-start_stops  = []
-for transaction in y:
-    time = datetime.datetime.strptime(transaction['TransactionDateTime'], '%m/%d/%Y %H:%M:%S').strftime('%s')
-    start_stops.append((int(time), True))
-    start_stops.append((int(time)+int(transaction['PaidDuration']), False))
-
-print start_stops
-start_stops.sort(key=lambda tup: tup[0])
-print start_stops
-
-maxOccupancy = 0
-curr = 0
-for tup in start_stops:
-    print curr
-    if tup[1]:
-        curr += 1
-        maxOccupancy = max([maxOccupancy, curr])
-    else:
-        curr -= 1
-print maxOccupancy
+pickle.dump(d, open('occupancies.pickle', 'wb'))
