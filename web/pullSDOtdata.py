@@ -38,8 +38,9 @@ for x in xrange(52):
         print row
         transactions[row[0]] = {keys[col_index]: row[col_index] for col_index in xrange(12)}
         
-    startDate = endDate + datetime.timedelta(days=1)
 
     outputFile = open('2015data/' + startDate.strftime('%m%d') + endDate.strftime('%m%d') + '.p', 'wb')
+
+    startDate = endDate + datetime.timedelta(days=1)
     pickle.dump(transactions, outputFile)
     outputFile.close()
