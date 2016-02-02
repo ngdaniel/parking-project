@@ -1,6 +1,12 @@
 import SimpleHTTPServer
 import SocketServer
 
+"""""""""
+
+easy local http server to query html from
+
+"""""""""
+
 PORT = 8000
 
 Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
