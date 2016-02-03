@@ -27,7 +27,7 @@ for k, v in transactions.iteritems():
         loc = locations.get(int(v['ElementKey']))
         if loc:
             #add data to dictionary for each hour in duration of transaction
-            for x in xrange(time.hour, time+datetime.timedelta(seconds=int(v['PaidDuration'])).hour):
+            for x in xrange(time.hour, (time+datetime.timedelta(seconds=int(v['PaidDuration']))).hour):
                 locs_per_hr[x].append((loc[0], loc[1]))
 
 #generate heatmap for each hour

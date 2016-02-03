@@ -1,7 +1,4 @@
-import marshal as pickle
-import numpy as np
-import gmplot # you need to install this from the above link
-import matplotlib.pyplot as plt
+import marshal
 import urllib2
 import csv
 import datetime
@@ -36,13 +33,13 @@ for x in xrange(52):
     Month (9)                           Text               The month of the transaction as recorded (derived from TransactionDateTime) 
     '''
 
-    keys = csvFile.next() 
+    keys = csvFile.next()
 
     for row in csvFile:
         transactions[row[0]] = {keys[col_index]: row[col_index] for col_index in xrange(12)}
         
-    outputFile = open('/datastore/2015data/' + startDate.strftime('%m%d') + '_' + endDate.strftime('%m%d') + '.p', 'wb')
+    outputFile = open('/datastore/2015data/' + startDate.strftime('%m%d') + '_' + endDate.strftime('%m%d') + '.d', 'wb')
 
     startDate = endDate + datetime.timedelta(days=1)
-    pickle.dump(transactions, outputFile)
+    marshal.dump(transactions, outputFile)
     outputFile.close()
