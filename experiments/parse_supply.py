@@ -12,4 +12,4 @@ for row_index in xrange(1, paid_spaces_supply.nrows):
     if not paid_spaces_supply.cell_value(row_index, 17) and paid_spaces_supply.cell_value(row_index, 4):
         curr_occupancies[int(paid_spaces_supply.cell_value(row_index, 1))] = int(paid_spaces_supply.cell_value(row_index, 4))
 
-marshal.dump(open('datastore/paid_space_supply.b', 'wb'))
+marshal.dump(curr_occupancies, open('datastore/paid_space_supply.b', 'wb'))
