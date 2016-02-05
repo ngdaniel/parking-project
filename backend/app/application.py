@@ -4,24 +4,24 @@ import time
 import datetime
 import math
 
-app = Flask(__name__)
+application = Flask(__name__)
 mysql = MySQL()
  
-app.config['MYSQL_DATABASE_USER'] = 'parking'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'sdotpark1ng'
-app.config['MYSQL_DATABASE_DB'] = 'parking'
-app.config['MYSQL_DATABASE_HOST'] = 'parking-cluster.cluster-c9q5edmigsud.us-west-2.rds.amazonaws.com'
-app.config['MYSQL_DATABASE_PORT'] = 3306
-mysql.init_app(app)
+application.config['MYSQL_DATABASE_USER'] = 'parking'
+application.config['MYSQL_DATABASE_PASSWORD'] = 'sdotpark1ng'
+application.config['MYSQL_DATABASE_DB'] = 'parking'
+application.config['MYSQL_DATABASE_HOST'] = 'parking-cluster.cluster-c9q5edmigsud.us-west-2.rds.amazonaws.com'
+application.config['MYSQL_DATABASE_PORT'] = 3306
+mysql.init_app(application)
 
 conn = mysql.connect()
 cur = conn.cursor()
 
-@app.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def index():
     return str([(k, v) for k, v in request.args.iteritems()])
 
-@app.route('/paystations', methods=['GET', 'POST'])
+@application.route('/paystations', methods=['GET', 'POST'])
 def get_paystations():
     element_keys = request.args.get('element_keys', None)
     query = "SELECT * FROM pay_stations"
@@ -32,7 +32,7 @@ def get_paystations():
         cur.execute(query)
     return str(cur.fetchall())
 
-@app.route('/paystations_in_radius', methods=['GET', 'POST'])
+@application.route('/paystations_in_radius', methods=['GET', 'POST'])
 def get_paystations_in_radius():
     lat = request.args.get('latitude', None)
     lon = request.args.get('longitude', None)
@@ -65,10 +65,10 @@ def get_paystations_in_radius():
     cur.execute(query.format(math.radians(lat), math.radians(lon), R, minlat, maxlat, minlon, maxlon, rad))
     return str(cur.fetchall())
 
-@app.route('/transactions')
+@application.route('/transactions')
 def get_transactions(self, start=631180800, end=int(time.mktime(datetime.datetime.now().timetuple()))):
     pass
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+    application.debug = True
+    application.run()
