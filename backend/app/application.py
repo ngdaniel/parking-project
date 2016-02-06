@@ -11,7 +11,7 @@ mysql = MySQL()
 application.config['MYSQL_DATABASE_USER'] = os.environ.get('RDS_USERNAME')
 application.config['MYSQL_DATABASE_PASSWORD'] = os.environ.get('RDS_PASSWORD')
 application.config['MYSQL_DATABASE_DB'] = 'parking'
-application.config['MYSQL_DATABASE_HOST'] = 'parking-cluster.cluster-c9q5edmigsud.us-west-2.rds.amazonaws.com'
+application.config['MYSQL_DATABASE_HOST'] = 'parking-sql.c9q5edmigsud.us-west-2.rds.amazonaws.com'
 application.config['MYSQL_DATABASE_PORT'] = 3306
 mysql.init_app(application)
 
