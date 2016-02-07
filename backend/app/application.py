@@ -1,5 +1,6 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort , render_template ,jsonify
 from flask.ext.mysql import MySQL
+import json
 import time
 import datetime
 import math
@@ -15,16 +16,17 @@ application.config['MYSQL_DATABASE_HOST'] = 'parking.c9q5edmigsud.us-west-2.rds.
 application.config['MYSQL_DATABASE_PORT'] = 3306
 mysql.init_app(application)
 
+conn = mysql.connect()
+cur = conn.cursor()
 
-@application.route('/', methods=['GET', 'POST'])
-def index():
-    return str([(k, v) for k, v in request.args.iteritems()])
+#@application.route('/', methods=['GET', 'POST'])
+#def index():
+#    return str([(k, v) for k, v in request.args.iteritems()])
 
 @application.route('/paystations', methods=['GET', 'POST'])
 def get_paystations():
     element_keys = request.args.get('element_keys', None)
     query = "SELECT * FROM pay_stations"
-    cur = mysql.connect().cursor()
     if element_keys:
         query += " WHERE element_key IN ({0})" 
         cur.execute(query.format(', '.join(element_keys.split())))
@@ -40,7 +42,6 @@ def get_paystations_in_radius():
     if not lon or not lat or not rad:
         abort(400)
 
-    cur = mysql.connect().cursor()
     lat = float(lat)
     lon = float(lon)
     rad = float(rad)
@@ -62,14 +63,18 @@ def get_paystations_in_radius():
             ) AS firstcut \
             WHERE acos(sin({0})*sin(radians(latitude)) + cos({0})*cos(radians(latitude))*cos(radians(longitude)-{1})) * {2} < {7} \
             ORDER BY D"
-
     cur.execute(query.format(math.radians(lat), math.radians(lon), R, minlat, maxlat, minlon, maxlon, rad))
-    return str(cur.fetchall())
-
+    results = cur.fetchall()
+    return jsonify(result =results)
 @application.route('/transactions')
 def get_transactions(self, start=631180800, end=int(time.mktime(datetime.datetime.now().timetuple()))):
     pass
 
+@application.route('/')    
+def index():
+    return render_template('index.html')
+
+
 if __name__ == "__main__":
     application.debug = True
-    application.run()
+    application.run(threaded=True, port = 5000)

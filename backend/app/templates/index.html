@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block body %}
+<script type=text/javascript>
+String.prototype.format = function () {
+  var i = 0, args = arguments;
+  return this.replace(/{}/g, function () {
+    return typeof args[i] != 'undefined' ? args[i++] : '';
+  });
+};
+
+  $(function() {
+    $('a#calculate').bind('click', function() {
+      $.getJSON($SCRIPT_ROOT + '/paystations_in_radius', {
+        latitude: $('input[name="latitude"]').val(),
+        longitude: $('input[name="longitude"]').val(),
+        radius: $('input[name="radius"]').val()
+      }, function(data) {
+        $.each(data.result, function(index){
+            payStationItem = data.result[index]
+            console.log(index);
+            idNumber=payStationItem[0];
+            meterLong = payStationItem[1];
+            meterLat =payStationItem[2];
+            meterMaxOcc =payStationItem[3];
+            distance =payStationItem[4];
+            text= '<li> PayStation {} is located at ({} , {}), maximum occupancy is {} cars and is {} km away'.format(idNumber,meterLong,meterLat,meterMaxOcc,distance);
+            $("#resultList").after(text);
+            
+        });
+      // $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+<h1>Pay Stations within a radius of a point</h1>
+<form>
+<fieldset>
+   Latitude:    <input type=text size=20 name=latitude><br> 
+   Longitutde:  <input type=text size=20 name=longitude> <br>
+   Radius (km): <input type=text size=20 name=radius> <br>
+    <a href=# id=calculate>calculate positions of </a>
+</fieldset>
+</form>
+<h2> Results </h2>
+<ul id="resultList">
+</ul>
+<p> <span id=result></span></p>
+
+
+{% endblock %}
