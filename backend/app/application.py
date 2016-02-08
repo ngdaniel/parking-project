@@ -15,8 +15,6 @@ application.config['MYSQL_DATABASE_HOST'] = 'parking.c9q5edmigsud.us-west-2.rds.
 application.config['MYSQL_DATABASE_PORT'] = 3306
 mysql.init_app(application)
 
-conn = mysql.connect()
-cur = conn.cursor()
 
 @application.route('/', methods=['GET', 'POST'])
 def index():
@@ -26,6 +24,7 @@ def index():
 def get_paystations():
     element_keys = request.args.get('element_keys', None)
     query = "SELECT * FROM pay_stations"
+    cur = mysql.connect().cursor()
     if element_keys:
         query += " WHERE element_key IN ({0})" 
         cur.execute(query.format(', '.join(element_keys.split())))
@@ -41,6 +40,7 @@ def get_paystations_in_radius():
     if not lon or not lat or not rad:
         abort(400)
 
+    cur = mysql.connect().cursor()
     lat = float(lat)
     lon = float(lon)
     rad = float(rad)
