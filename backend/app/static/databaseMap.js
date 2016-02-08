@@ -45,15 +45,17 @@ String.prototype.format = function () {
         map.addListener('click',function(e) {
             placeMarkerAndFindPayStations(e.latLng,map);
         });
-           
+         
         //Gets data points from library and plots the markers 
         function placeMarkerAndFindPayStations(latLng,map){
              clearMap();
+             searchRadius = $('input[name="radius"]').val();
              $.getJSON($SCRIPT_ROOT + '/paystations_in_radius', {
                 latitude: latLng.lat,
                 longitude: latLng.lng,
-                radius: .1
+                radius: searchRadius
                 }, function(data) {
+                markAndCircle(latLng,searchRadius,map);
                 $.each(data.result, function(index){
                     payStationItem = data.result[index]
                     meterLat =payStationItem[1];
@@ -76,10 +78,28 @@ String.prototype.format = function () {
                     }
                     markersList = [];
             }
+        //takes a latLong object , radius , and map 
+        //draws a maker and circle around point
+       function markAndCircle(searchCoord,searchRadius,map){
+            var marker = new google.maps.Marker({
+                    position :searchCoord ,
+                    map: map,
+                 });
+            var cityCircle = new google.maps.Circle({
+              strokeColor: '#FF0000',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: '#FF0000',
+              fillOpacity: 0.35,
+              map: map,
+              center:searchCoord ,
+              radius: searchRadius*1000 //radius is in meters
+              });
+            markersList.push(marker);
+            markersList.push(cityCircle);
+           }
     }
-    
- 
-  
+        
   });
 
    
