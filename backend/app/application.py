@@ -16,14 +16,16 @@ application.config['MYSQL_DATABASE_HOST'] = 'parking.c9q5edmigsud.us-west-2.rds.
 application.config['MYSQL_DATABASE_PORT'] = 3306
 mysql.init_app(application)
 
-@application.route('/')    
-def index():
-    return render_template('index.html')
+conn = mysql.connect()
+cur = conn.cursor()
+
+#@application.route('/', methods=['GET', 'POST'])
+#def index():
+#    return str([(k, v) for k, v in request.args.iteritems()])
 
 @application.route('/paystations', methods=['GET', 'POST'])
 def get_paystations():
     element_keys = request.args.get('element_keys', None)
-    cur = mysql.connect().cursor()
     query = "SELECT * FROM pay_stations"
     if element_keys:
         query += " WHERE element_key IN ({0})" 
@@ -40,7 +42,6 @@ def get_paystations_in_radius():
     if not lon or not lat or not rad:
         abort(400)
 
-    cur = mysql.connect().cursor()
     lat = float(lat)
     lon = float(lon)
     rad = float(rad)
@@ -67,14 +68,14 @@ def get_paystations_in_radius():
     return jsonify(result =results)
 
 @application.route('/transactions')
-def get_transactions():
-    cur = mysql.connect().cursor()
-    start = datetime.datetime.fromtimestamp(int(request.args.get('start', 631180800)))
-    end = datetime.datetime.fromtimestamp(int(request.args.get('end', int(time.mktime(datetime.datetime.now().timetuple())))))
-    query = "SELECT * FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}';"
-    cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), end.strftime('%Y-%m-%d %H:%M:%S')))
-    return str(cur.fetchall())
+def get_transactions(self, start=631180800, end=int(time.mktime(datetime.datetime.now().timetuple()))):
+    pass
+
+@application.route('/')    
+def index():
+    return render_template('index.html')
+
 
 if __name__ == "__main__":
     application.debug = True
-    application.run(threaded=True, port = 5000)
+    application.run(threaded=True, port = 5002)
