@@ -47,9 +47,11 @@ String.prototype.format = function () {
         });
          
         //Gets data points from library and plots the markers 
+        //radius is gotten from textBox, default is 250m 
         function placeMarkerAndFindPayStations(latLng,map){
              clearMap();
              searchRadius = $('input[name="radius"]').val();
+             if(searchRadius == 0){searchRadius = .25}
              $.getJSON($SCRIPT_ROOT + '/paystations_in_radius', {
                 latitude: latLng.lat,
                 longitude: latLng.lng,
