@@ -4,6 +4,7 @@ import csv
 import datetime
 import MySQLdb
 import os
+import pytz
 
 """""""""
 
@@ -57,7 +58,10 @@ keys = csvFile.next()
 for row in csvFile:
     query = 'INSERT INTO transactions (data_id, meter_code, transaction_id, timestamp, amount, payment_mean, duration, element_key) VALUES ('\
             + row[0] + ', ' + row[1] + ', ' + row[2] + ', "' + datetime.datetime.strptime(row[3], '%d/%m/%Y %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S') + '", ' + row[4] + ', "' + row[6] + '", ' + row[7] + ', ' + row[8] + ')' 
-    cursor.execute(query)
+    try: 
+        cursor.execute(query)
+    except MySQLdb.IntegrityError:
+        print(row[2] + ": dup")
 
 db.commit()
 db.close()
