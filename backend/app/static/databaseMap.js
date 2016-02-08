@@ -71,7 +71,8 @@ String.prototype.format = function () {
                     var marker = new google.maps.Marker({
                         position : new google.maps.LatLng(meterLat,meterLong),
                         map: map,
-                        icon:$SCRIPT_ROOT + '/static/parking-meter-export.png' 
+                        icon:$SCRIPT_ROOT + '/static/parkingBlue.png'
+                        //have different colored parking .png files for busy/notbusy/somewhat busy
                      });
                     //TODO: Make a better looking Info window
                      infoWindowContent = '<p>parkingMeter {} has a max capacity {} and is {} km away from destination </p>'.format(idNumber,meterMaxOcc,distance); 
