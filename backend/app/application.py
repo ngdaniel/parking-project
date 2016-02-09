@@ -1,3 +1,4 @@
+from __future__ import division
 from flask import Flask, request, abort , render_template ,jsonify
 from flask.ext.mysql import MySQL
 import json
@@ -74,6 +75,44 @@ def get_transactions():
     query = "SELECT * FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}';"
     cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), end.strftime('%Y-%m-%d %H:%M:%S')))
     return str(cur.fetchall())
+
+@application.route('/densities')
+def get_densities():
+    cur = mysql.connect().cursor()
+    at_time = datetime.datetime.fromtimestamp(int(request.args.get('at_time', int(time.mktime(datetime.datetime.now().timetuple())))))
+    start = at_time - datetime.timedelta(hours=24)
+    query = "SELECT element_key, timestamp, duration FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}';"
+    cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), at_time.strftime('%Y-%m-%d %H:%M:%S')))
+    transactions = cur.fetchall()
+    timeframes = {}
+    for transaction in transactions:
+        times = [(transaction[1], True), (transaction[1] + datetime.timedelta(seconds=transaction[2]), False)]
+        if timeframes.get(transaction[0]):
+            timeframes[transaction[0]].extend(times)
+        else:
+            timeframes[transaction[0]] = times
+    occupancies = {}
+    for key, times in timeframes.iteritems():
+        occupancy = 0
+        for t in times:
+            if t[0] < at_time:
+                if t[1]:
+                    occupancy += 1
+                else:
+                    occupancy -= 1
+        occupancies[key] = occupancy
+    densities = {}
+    for key, occupancy in occupancies.iteritems():
+        query = "SELECT max_occupancy FROM blockfaces WHERE element_key = {0};"
+        cur.execute(query.format(key))
+        max_occupancy = cur.fetchone()[0]
+        densities[key] = occupancy/max_occupancy
+
+    return json.dumps(densities)
+        
+
+     
+
 
 if __name__ == "__main__":
     application.debug = True
