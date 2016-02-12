@@ -3,7 +3,7 @@ import MySQLdb
 import os
 
 blockfaces = marshal.load(open('datastore/allblockfaces.m', 'rb'))
-occupancies = marshal.load(open('datastore/blockface_occupancies.m'))
+occupancies = marshal.load(open('datastore/paid_space_supply.b', 'rb'))
     
 db = MySQLdb.connect(host="parking.c9q5edmigsud.us-west-2.rds.amazonaws.com", port=3306, user=os.environ.get('RDS_USERNAME'), passwd=os.environ.get('RDS_PASSWORD'), db="parking")
 cursor = db.cursor()

@@ -67,7 +67,7 @@ def get_paystations_in_radius():
     results = cur.fetchall()
     return jsonify(result =results)
 
-@application.route('/transactions')
+@application.route('/transactions', methods=['GET', 'POST'])
 def get_transactions():
     cur = mysql.connect().cursor()
     start = datetime.datetime.fromtimestamp(int(request.args.get('start', 631180800)))
@@ -76,43 +76,33 @@ def get_transactions():
     cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), end.strftime('%Y-%m-%d %H:%M:%S')))
     return str(cur.fetchall())
 
-@application.route('/densities')
+@application.route('/densities', methods=['GET', 'POST'])
 def get_densities():
     cur = mysql.connect().cursor()
-    at_time = datetime.datetime.fromtimestamp(int(request.args.get('at_time', int(time.mktime(datetime.datetime.now().timetuple())))))
+    at_time = datetime.datetime.fromtimestamp(int(request.args.get('time', int(time.mktime(datetime.datetime.now().timetuple())))))
     start = at_time - datetime.timedelta(hours=24)
     query = "SELECT element_key, timestamp, duration FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}';"
     cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), at_time.strftime('%Y-%m-%d %H:%M:%S')))
     transactions = cur.fetchall()
     timeframes = {}
-    for transaction in transactions:
-        times = [(transaction[1], True), (transaction[1] + datetime.timedelta(seconds=transaction[2]), False)]
-        if timeframes.get(transaction[0]):
-            timeframes[transaction[0]].extend(times)
-        else:
-            timeframes[transaction[0]] = times
     occupancies = {}
-    for key, times in timeframes.iteritems():
-        occupancy = 0
-        for t in times:
-            if t[0] < at_time:
-                if t[1]:
-                    occupancy += 1
-                else:
-                    occupancy -= 1
-        occupancies[key] = occupancy
+    for transaction in transactions:
+        if transaction[1] < at_time:
+            occupancies[transaction[0]] = occupancies.get(transaction[0], 0) + 1
+        if transaction[1] + datetime.timedelta(seconds=transaction[2]) < at_time:
+            occupancies[transaction[0]] = occupancies.get(transaction[0], 0) - 1
     densities = {}
     for key, occupancy in occupancies.iteritems():
-        query = "SELECT max_occupancy FROM blockfaces WHERE element_key = {0};"
-        cur.execute(query.format(key))
-        max_occupancy = cur.fetchone()[0]
-        densities[key] = occupancy/max_occupancy
+        if occupancy:
+            query = "SELECT max_occupancy FROM blockfaces WHERE element_key = {0};"
+            cur.execute(query.format(key))
+            max_occupancy = cur.fetchone()
+            if max_occupancy:
+                max_occupancy = max_occupancy[0]
+                densities[key] = str(occupancy) + '/' + str(max_occupancy)
 
     return json.dumps(densities)
         
-
-     
-
 
 if __name__ == "__main__":
     application.debug = True
