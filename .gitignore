@@ -12,5 +12,5 @@ pyvenv.cfg
 pip-selfcheck.json
 
 .elasticbeanstalk/
-DS_Store
+.DS_Store
 .idea
