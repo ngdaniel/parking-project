@@ -1,11 +1,12 @@
 from __future__ import division
-from flask import Flask, request, abort , render_template ,jsonify
+from flask import Flask,Response, request, abort , render_template ,jsonify
 from flask.ext.mysql import MySQL
 import json
 import time
 import datetime
 import math
 import os
+import requests
 
 application = Flask(__name__)
 mysql = MySQL()
@@ -65,7 +66,7 @@ def get_paystations_in_radius():
             ORDER BY D"
     cur.execute(query.format(math.radians(lat), math.radians(lon), R, minlat, maxlat, minlon, maxlon, rad))
     results = cur.fetchall()
-    return jsonify(result =results)
+    return jsonify(result = results)
 
 @application.route('/transactions', methods=['GET', 'POST'])
 def get_transactions():
@@ -103,6 +104,20 @@ def get_densities():
 
     return json.dumps(densities)
         
+@application.route('/route', methods=['GET', 'POST'])
+def google_request_get_route():
+   key ='AIzaSyAqwnF0OCYJ6IWqWeUBifZpZ7DsI2UOWcI'
+   #TODO: Make origin ask GPS LOCAtion,
+   destinationLat = request.args.get('destinationLat')
+   destinationLon = request.args.get('destinationLon')
+   originLatitude = request.args.get('originLat', None)
+   originLongitude = request.args.get('originLon', None)
+   origin ='%s,%s' % (originLatitude,originLongitude)
+   destination ='%s,%s' % (destinationLat,destinationLon)
+   url ='https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&key=%s' % (origin,destination,key)  
+   r = requests.get(url)
+   return Response( json.dumps(r.text ),mimetype='application/json')
+
 
 if __name__ == "__main__":
     application.debug = True

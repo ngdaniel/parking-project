@@ -1,25 +1,21 @@
 {% extends "layout.html" %}
 {% block body %}
 
-
-<h1>Pay Stations within a radius of a point</h1>
-<form>
-    <fieldset>
-        Latitude:    <input type=text size=20 name=latitude><br>
-        Longitutde:  <input type=text size=20 name=longitude> <br>
-        Radius (km): <input type=text size=20 name=radius> <br>
-        <a href=# id=calculate>calculate positions of </a>
-    </fieldset>
-</form>
-
-<h2> Results </h2>
-<ul id="resultList"></ul>
-
-
-
-<div id="container">
-           <!-- <div id="nav">Nav Menu</div>-->
-    <div id="map"></div>
+    <div id="nav">
+        Current Latitude : <input type=text size=20 name=latitudeOrigin><br>
+        Current Longitude: <input type=text size=20 name=longitudeOrigin><br> 
+        <button id=getGpsLocation>Use current GPS </button> 
+        <button id=routeToLocation>Route to map marker </button>
+    <div id ="directions">
+    <div>
+  </div>
+     
+    
+   
+   <div id="map">
+    
+    
+    </div>
 </div>
 
 
