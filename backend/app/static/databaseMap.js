@@ -8,7 +8,7 @@ String.prototype.format = function() {
 };
 
 
-//On document creation adds click event handler to forms
+//On document creation adds click event handler to forms 
 $(function() {
 	$('a#calculate').bind('click', function() {
 		$.getJSON($SCRIPT_ROOT + '/paystations_in_radius', {
@@ -44,36 +44,11 @@ $(function() {
 			},
 			zoom: 15,
 			disableDefaultUI: true,
-			scrollwheel: true
+			scrollwheel: false
 		});
 		map.addListener('click', function(e) {
 			placeMarkerAndFindPayStations(e.latLng, map);
 		});
-
-    var url = "backend/app/static/streets.json";
-
-    $.getJSON(url, function (data) {
-
-        //  Parse the Linestring field into an array of LatLngs
-        $.each(data.data, function(index, record) {
-            var mypath = new Array();
-            line = JSON.parse(record.Linestring);
-            //  Parse the array of LatLngs into Gmap points
-            for(var i=0; i < line.length; i++){
-                //Tokenise the coordinates
-                var coords = (new String(line[i])).split(",");
-                mypath.push(new google.maps.LatLng(coords[1], coords[0]));
-            }
-            var polyline = new google.maps.Polyline({
-                path: mypath,
-                strokeColor: '#ff0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 3
-            });
-            polyline.setMap(map);
-        });
-
-    });
 
 		//Gets data points from library and plots the markers
 		//radius is gotten from textBox, default is 250m
