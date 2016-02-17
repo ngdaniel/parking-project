@@ -26,7 +26,7 @@ def index():
 def get_paystations():
     element_keys = request.args.get('element_keys', None)
     cur = mysql.connect().cursor()
-    query = "SELECT * FROM pay_stations"
+    query = "SELECT * FROM blockfaces"
     if element_keys:
         query += " WHERE element_key IN ({0})" 
         cur.execute(query.format(', '.join(element_keys.split())))
