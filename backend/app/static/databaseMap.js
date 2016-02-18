@@ -105,17 +105,21 @@ String.prototype.format = function() {
                 console.log(data)
                 markAndCircle(latLng,searchRadius,map);
                 //Loop over each datapoint(payStation)
-                console.log(data.result[0][4]);
-                nearestPayStation = data.result[0];
-                $.each(data.result, function(index){
-                    payStationItem = data.result[index]
-                    idNumber=payStationItem[0];
-                    meterLat =payStationItem[1];
-                    meterLong = payStationItem[2];
-                    meterMaxOcc =payStationItem[3];
-                    distance =payStationItem[4];
-                    if(nearestPayStation[4] > payStationItem[4]){
-                        nearestPayStation = payStationItem;
+                console.log(data);
+                //nearestPayStation = data.result[0];
+                $.each(data, function(index){
+                    payStationItem = data[index]
+                    console.log(payStationItem)
+                    for (var key in payStationItem) {
+                        idNumber=key
+                        meterLat =payStationItem[key][0];
+                        meterLong = payStationItem[key][1];
+                        meterMaxOcc =payStationItem[key][2];
+                        distance =payStationItem[key][3];
+
+                        //if(nearestPayStation[4] > payStationItem[3]){
+                         //   nearestPayStation = payStationItem;
+                        //}
                     }
                     //Adds marker and infowindow  + click listners for each payStation
                     var marker = new google.maps.Marker({
@@ -139,7 +143,7 @@ String.prototype.format = function() {
                      infoWindowList.push(infoWindow);
 
                 });
-              console.log(nearestPayStation[4]);
+              //console.log(nearestPayStation[4]);
               });
               return false;
         }
