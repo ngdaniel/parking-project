@@ -78,11 +78,15 @@ def get_paystations_in_radius():
 @application.route('/transactions', methods=['GET', 'POST'])
 def get_transactions():
     cur = mysql.connect().cursor()
-    start = datetime.datetime.fromtimestamp(int(request.args.get('start', 631180800)))
+    start = datetime.datetime.fromtimestamp(int(request.args.get('start', int(time.mktime((datetime.datetime.now()-datetime.timedelta(days=7)).timetuple())))))
     end = datetime.datetime.fromtimestamp(int(request.args.get('end', int(time.mktime(datetime.datetime.now().timetuple())))))
     query = "SELECT * FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}';"
     cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), end.strftime('%Y-%m-%d %H:%M:%S')))
-    return str(cur.fetchall())
+    ret = {}
+    for t in cur.fetchall():
+        ret[t[0]] = list(t[1:2]) + [str(t[3])] + [t[4]]
+        
+    return json.dumps(ret)
 
 @application.route('/densities', methods=['GET', 'POST'])
 def get_densities():
@@ -110,7 +114,7 @@ def get_densities():
                 densities[key] = str(occupancy) + '/' + str(max_occupancy)
     ret = {}
     for ps in cur.fetchall():
-        ret[ps[0]] = ps[1:]
+        ret[ps[0]] = [str(ps[1])] + ps[2:]
         
     return json.dumps(ret)
         
