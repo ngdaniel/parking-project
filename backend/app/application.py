@@ -32,7 +32,11 @@ def get_paystations():
         cur.execute(query.format(', '.join(element_keys.split())))
     else:
         cur.execute(query)
-    return str(cur.fetchall())
+    ret = {}
+    for ps in cur.fetchall():
+        ret[ps[0]] = ps[1:]
+        
+    return json.dumps(ret)
 
 @application.route('/paystations_in_radius', methods=['GET', 'POST'])
 def get_paystations_in_radius():
@@ -65,8 +69,11 @@ def get_paystations_in_radius():
             WHERE acos(sin({0})*sin(radians(latitude)) + cos({0})*cos(radians(latitude))*cos(radians(longitude)-{1})) * {2} < {7} \
             ORDER BY D"
     cur.execute(query.format(math.radians(lat), math.radians(lon), R, minlat, maxlat, minlon, maxlon, rad))
-    results = cur.fetchall()
-    return jsonify(result = results)
+    ret = {}
+    for ps in cur.fetchall():
+        ret[ps[0]] = ps[1:]
+        
+    return json.dumps(ret)
 
 @application.route('/transactions', methods=['GET', 'POST'])
 def get_transactions():
@@ -101,8 +108,11 @@ def get_densities():
             if max_occupancy:
                 max_occupancy = max_occupancy[0]
                 densities[key] = str(occupancy) + '/' + str(max_occupancy)
-
-    return json.dumps(densities)
+    ret = {}
+    for ps in cur.fetchall():
+        ret[ps[0]] = ps[1:]
+        
+    return json.dumps(ret)
         
 @application.route('/route', methods=['GET', 'POST'])
 def google_request_get_route():
