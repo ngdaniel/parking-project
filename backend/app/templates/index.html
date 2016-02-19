@@ -2,11 +2,13 @@
 {% block body %}
 
 
-    <div id="nav"> 
+    <div id="nav">
         Current Latitude : <input type=text size=20 name=latitudeOrigin><br>
-            Current Longitude: <input type=text size=20 name=longitudeOrigin><br> 
-            <button id=getGpsLocation>Use current GPS </button> 
-            <button id=routeToLocation>Route to map marker </button>
+        Current Longitude: <input type=text size=20 name=longitudeOrigin><br>
+        <button id=getGpsLocation>Use current GPS </button>
+        <button id=routeToLocation>Route to map marker </button>
+        <label><input type="checkbox" id="showLines" />Paystations</label>
+
         <div id ="directions"></div>
    </div>
     <div id="map"></div>
