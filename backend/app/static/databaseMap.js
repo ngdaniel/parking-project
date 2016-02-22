@@ -171,8 +171,8 @@ $(function() {
 				console.log(data)
 				markAndCircle(latLng, searchRadius, map);
 				//Loop over each datapoint(payStation)
-				nearestPayStation == null;
-                nearestPayStation == null;
+				nearestPayStation = null;
+                nearestPayStation = null;
                 $.each(data, function(index) {
 					payStationItem = data[index];
 					console.log(payStationItem);
