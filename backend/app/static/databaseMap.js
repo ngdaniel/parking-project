@@ -57,7 +57,7 @@ $(function() {
 	// Parse paystation endpoint
 	function getPaystations() {
 		// Loop through paystations and draw each block with dynamic color
-		$.getJSON("http://127.0.0.1:5000/paystations", function(result) {
+		$.getJSON(  $SCRIPT_ROOT+ "/paystations", function(result) {
 			$.each(result, function(i, data) {
 				// data [0:3] start and end coords, [4:5] center coord [6] capacity
 				var coords = new Array(); //TODO is this line needed
@@ -81,8 +81,9 @@ $(function() {
 	var driveCoordinates = [];
 	var drivePath;
 	$('#routeToLocation').bind('click', function() {
-		nearestPayStationLat = nearestPayStation[1];
-		nearestPayStationLng = nearestPayStation[2];
+		nearestPayStationLat = nearestPayStation[0];
+		nearestPayStationLng = nearestPayStation[1];
+        console.log('look for paystation location at'+ nearestPayStationLat +' ' + nearestPayStationLng);
 		$.getJSON($SCRIPT_ROOT + '/route', {
 				destinationLat: nearestPayStationLat,
 				destinationLon: nearestPayStationLng,
@@ -94,7 +95,7 @@ $(function() {
 				console.log(data);
 				json_object = JSON.parse(data);
 				console.log(json_object);
-
+                //TODO: Iterate over options and create differnet directions 
 				$(json_object.routes[0].legs[0].steps).each(function(index) {
 					latC = ($(this.start_location.lat.toString()));
 					lngC = ($(this.start_location.lng.toString()));
@@ -102,8 +103,10 @@ $(function() {
 					lngCoord = lngC.selector;
 					driveCoordinates.push(new google.maps.LatLng(latCoord, lngCoord));
 				});
-				destinationLat = nearestPayStation[1];
-				destinationLng = nearestPayStation[2];
+				destinationLat = nearestPayStation[0];
+				destinationLng = nearestPayStation[1];
+                console.log("destination Lat = " + destinationLat);
+                console.log("destination Lng = " + destinationLng);
 				driveCoordinates.push(new google.maps.LatLng(destinationLat, destinationLng));
 				drivePath = new google.maps.Polyline({
 					path: driveCoordinates,
@@ -133,6 +136,7 @@ $(function() {
 		lng: -122.335167
 	};
 	var nearestPayStation;
+    var nearestPayStationID;
 	//Creates map over seattle and adds click dlistener
 	window.initMap = function() {
 		map = new google.maps.Map(document.getElementById('map'), {
@@ -140,7 +144,8 @@ $(function() {
 				lat: 47.60801,
 				lng: -122.335167
 			},
-			zoom: 12,
+			zoom: 12,//see entire city
+            //zoom:15, //see middle of downtown
 			disableDefaultUI: true,
 			scrollwheel: false,
 			zoomControl: true,
@@ -166,21 +171,26 @@ $(function() {
 				console.log(data)
 				markAndCircle(latLng, searchRadius, map);
 				//Loop over each datapoint(payStation)
-				console.log(data);
-				//nearestPayStation = data.result[0];
-				$.each(data, function(index) {
-					payStationItem = data[index]
-					console.log(payStationItem)
-					for (var key in payStationItem) {
-						idNumber = key
-						meterLat = payStationItem[key][0];
-						meterLong = payStationItem[key][1];
-						meterMaxOcc = payStationItem[key][2];
-						distance = payStationItem[key][3];
-
-						//if(nearestPayStation[4] > payStationItem[3]){
-						//   nearestPayStation = payStationItem;
-						//}
+				nearestPayStation == null;
+                nearestPayStation == null;
+                $.each(data, function(index) {
+					payStationItem = data[index];
+					console.log(payStationItem);
+					idNumber = index;
+                    for (var key in payStationItem) {
+						meterLat = payStationItem[0];
+						meterLong = payStationItem[1];
+						meterMaxOcc = payStationItem[2];
+						distance = payStationItem[3];
+                        if(nearestPayStation == null){
+                            nearestPayStation = payStationItem;
+                            nearestPayStationID = idNumber; 
+                        }
+						else if(nearestPayStation[3] > payStationItem[3]){
+                            console.log(payStationItem[3]);
+						    nearestPayStation = payStationItem;
+						    nearestPayStationID= idNumber;
+                        }
 					}
 					//Adds marker and infowindow  + click listners for each payStation
 					var marker = new google.maps.Marker({
