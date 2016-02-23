@@ -112,11 +112,8 @@ def get_densities():
             if max_occupancy:
                 max_occupancy = max_occupancy[0]
                 densities[key] = str(occupancy) + '/' + str(max_occupancy)
-    ret = {}
-    for ps in cur.fetchall():
-        ret[ps[0]] = [str(ps[1])] + ps[2:]
         
-    return json.dumps(ret)
+    return json.dumps(densities)
         
 @application.route('/route', methods=['GET', 'POST'])
 def google_request_get_route():
