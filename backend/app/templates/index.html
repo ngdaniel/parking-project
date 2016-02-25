@@ -3,13 +3,19 @@
 
 
     <div id="nav">
-        Current Latitude : <input type=text size=20 name=latitudeOrigin><br>
-        Current Longitude: <input type=text size=20 name=longitudeOrigin><br>
-        <button id=getGpsLocation>Use current GPS </button>
+        Current Latitude : <input type='text' size=20 name='latitudeOrigin'><br>
+        Current Longitude: <input type='text' size=20 name='longitudeOrigin'><br>
+        <button id=getGpsLocation>Use current GPS </button><br>
+        <h1>[OR]</h1>
+        A : <input type='text' size=20 id='dirSrc'><br>
+        B : <input type='text' size=20 id='dirDst'><br>
+
         <button id=routeToLocation>Route to map marker </button>
         <label><input type="checkbox" id="showLines" />Paystations</label>
 
-        <div id ="directions"></div>
+        <div id ="busDirections"></div>
+        <div id ="drivingDirections">
+        </div>
    </div>
     <div id="map"></div>
 

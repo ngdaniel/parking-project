@@ -22,7 +22,7 @@ $(function() {
 		return false;
 	});
 
-	//////////////////////////////////////////////////////////////
+    	//////////////////////////////////////////////////////////////
 	// Paystation Lines
 
 	// Checkbox logic
@@ -80,45 +80,43 @@ $(function() {
 
 	var driveCoordinates = [];
 	var drivePath;
-	$('#routeToLocation').bind('click', function() {
-		nearestPayStationLat = nearestPayStation[0];
-		nearestPayStationLng = nearestPayStation[1];
-        console.log('look for paystation location at'+ nearestPayStationLat +' ' + nearestPayStationLng);
-		$.getJSON($SCRIPT_ROOT + '/route', {
-				destinationLat: nearestPayStationLat,
-				destinationLon: nearestPayStationLng,
-				originLat: $('input[name="latitudeOrigin"]').val(),
-				originLon: $('input[name="longitudeOrigin"]').val()
-			},
-			function(data) {
-				driveCoordinates = [];
-				console.log(data);
-				json_object = JSON.parse(data);
-				console.log(json_object);
-                //TODO: Iterate over options and create differnet directions 
-				$(json_object.routes[0].legs[0].steps).each(function(index) {
-					latC = ($(this.start_location.lat.toString()));
-					lngC = ($(this.start_location.lng.toString()));
-					latCoord = latC.selector;
-					lngCoord = lngC.selector;
-					driveCoordinates.push(new google.maps.LatLng(latCoord, lngCoord));
-				});
-				destinationLat = nearestPayStation[0];
-				destinationLng = nearestPayStation[1];
-                console.log("destination Lat = " + destinationLat);
-                console.log("destination Lng = " + destinationLng);
-				driveCoordinates.push(new google.maps.LatLng(destinationLat, destinationLng));
-				drivePath = new google.maps.Polyline({
-					path: driveCoordinates,
-					geodesic: true,
-					strokeColor: '#FF0000',
-					strokeOpacity: 1.0,
-					strokeWeight: 2
-				});
-				addLine();
-			})
-		return false;
-	});
+	    
+    $('#routeToLocation').bind('click', function() {
+        destinationLat= nearestPayStation[0];
+        destinationLon= nearestPayStation[1];
+        originLat = $('input[name="latitudeOrigin"]').val();
+		originLon= $('input[name="longitudeOrigin"]').val();
+        
+        directionsService.route({
+            origin: new google.maps.LatLng(originLat,originLon),
+            destination: new google.maps.LatLng(destinationLat,destinationLon),
+            travelMode: google.maps.TravelMode.DRIVING,
+            provideRouteAlternatives:true
+        }, function (response,status){
+            if(status == google.maps.DirectionsStatus.OK){
+                directionsDisplay.setDirections(response);
+            }
+            else{
+                window.alert('Directions request faield due to ' + status);
+            }
+        });
+        
+      
+      directionsServiceBus.route({
+            origin: new google.maps.LatLng(originLat,originLon),
+            destination: new google.maps.LatLng(destinationLat,destinationLon),
+            travelMode: google.maps.TravelMode.TRANSIT
+        }, function (response,status){
+            if(status == google.maps.DirectionsStatus.OK){
+                directionsDisplayBus.setDirections(response);
+            }
+            else{
+                window.alert('Directions request faield due to ' + status);
+            }
+        });
+        
+    })
+    
 
 	function addLine() {
 		drivePath.setMap(map);
@@ -129,7 +127,11 @@ $(function() {
 	}
 	//!!@!@!?@!?@?!@?!?///
 	var map;
-	var markersList = [];
+    var directionsService;
+    var directionsServiceBus;
+    var directionsDisplay ;
+    var directionsDisplayBus;
+    var markersList = [];
 	var infoWindowList = [];
 	var destination = {
 		lat: 47.60801,
@@ -137,22 +139,42 @@ $(function() {
 	};
 	var nearestPayStation;
     var nearestPayStationID;
+
+    var autoSrc;
+    var autoDst;
 	//Creates map over seattle and adds click dlistener
 	window.initMap = function() {
-		map = new google.maps.Map(document.getElementById('map'), {
+	    directionsService  = new google.maps.DirectionsService; 
+        directionsServiceBus = new google.maps.DirectionsService;
+        directionsDisplay = new google.maps.DirectionsRenderer;
+        directionsDisplayBus = new google.maps.DirectionsRenderer;
+
+
+        map = new google.maps.Map(document.getElementById('map'), {
 			center: {
 				lat: 47.60801,
 				lng: -122.335167
 			},
-			zoom: 12,//see entire city
-            //zoom:15, //see middle of downtown
+			//zoom: 12,//see entire city
+            zoom:15, //see middle of downtown
 			disableDefaultUI: true,
-			scrollwheel: false,
 			zoomControl: true,
 			zoomControlOptions: {
 				position: google.maps.ControlPosition.TOP_RIGHT
 			},
 		});
+       directionsDisplay.setMap(map);
+       directionsDisplay.setPanel(document.getElementById('drivingDirections'));
+       directionsDisplayBus.setMap(map);
+       directionsDisplayBus.setPanel(document.getElementById('busDirections'));
+
+       autoSrc  = new google.maps.places.Autocomplete(/** @type {!HTMLInputElement} */ (document.getElementById("dirSrc")));
+       
+       
+       autoDest = new google.maps.places.Autocomplete(/** @type {!HTMLInputElement} */  (document.getElementById("dirDst")));
+       
+
+
 		map.addListener('click', function(e) {
 			placeMarkerAndFindPayStations(e.latLng, map);
 		});
