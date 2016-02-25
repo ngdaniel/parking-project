@@ -1,6 +1,7 @@
 from __future__ import division
-from flask import Flask,Response, request, abort , render_template ,jsonify
+from flask import Flask, Response, request, abort , render_template ,jsonify
 from flask.ext.mysql import MySQL
+from flask.ext.cors import CORS
 import json
 import time
 import datetime
@@ -9,6 +10,7 @@ import os
 import requests
 
 application = Flask(__name__)
+CORS(application)
 mysql = MySQL()
  
 application.config['MYSQL_DATABASE_USER'] = os.environ.get('RDS_USERNAME')
@@ -93,16 +95,15 @@ def get_densities():
     cur = mysql.connect().cursor()
     at_time = datetime.datetime.fromtimestamp(int(request.args.get('time', int(time.mktime(datetime.datetime.now().timetuple())))))
     start = at_time - datetime.timedelta(hours=24)
-    query = "SELECT element_key, timestamp, duration FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}';"
+    query = "SELECT element_key, timestamp, duration FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}' order by duration;"
     cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), at_time.strftime('%Y-%m-%d %H:%M:%S')))
     transactions = cur.fetchall()
     timeframes = {}
     occupancies = {}
     for transaction in transactions:
-        if transaction[1] < at_time:
+        if transaction[1] + datetime.timedelta(seconds=transaction[2]) > at_time:
             occupancies[transaction[0]] = occupancies.get(transaction[0], 0) + 1
-        if transaction[1] + datetime.timedelta(seconds=transaction[2]) < at_time:
-            occupancies[transaction[0]] = occupancies.get(transaction[0], 0) - 1
+
     densities = {}
     for key, occupancy in occupancies.iteritems():
         if occupancy:
@@ -115,21 +116,6 @@ def get_densities():
         
     return json.dumps(densities)
         
-@application.route('/route', methods=['GET', 'POST'])
-def google_request_get_route():
-   key ='AIzaSyAqwnF0OCYJ6IWqWeUBifZpZ7DsI2UOWcI'
-   #TODO: Make origin ask GPS LOCAtion,
-   destinationLat = request.args.get('destinationLat')
-   destinationLon = request.args.get('destinationLon')
-   originLatitude = request.args.get('originLat', None)
-   originLongitude = request.args.get('originLon', None)
-   origin ='%s,%s' % (originLatitude,originLongitude)
-   destination ='%s,%s' % (destinationLat,destinationLon)
-   url ='https://maps.googleapis.com/maps/api/directions/json?origin=%s&destination=%s&key=%s' % (origin,destination,key)  
-   r = requests.get(url)
-   return Response( json.dumps(r.text ),mimetype='application/json')
-
-
 if __name__ == "__main__":
     application.debug = True
     application.run(threaded=True, port = 5000)
