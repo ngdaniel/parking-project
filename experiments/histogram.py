@@ -1,6 +1,7 @@
 import MySQLdb
 import datetime
 import pytz
+import marshal
 
 db = MySQLdb.connect(host="parking.c9q5edmigsud.us-west-2.rds.amazonaws.com", port=3306, user='parking', passwd='sdotpark1ng', db="parking")
 cur = db.cursor()
@@ -26,5 +27,6 @@ for x in xrange(3, 368):
                 counts[y] += 1
                 hour_counts[transaction[0]] = counts
                 
-    print hour_counts
                 
+
+marshal.dump(hour_counts, open('datastore/hist.b', 'wb'))

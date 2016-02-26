@@ -12,7 +12,7 @@ cursor = db.cursor()
 
 logging.basicConfig(filename='pull.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
 
-for x in xrange(2):
+for x in xrange(5):
     date = datetime.datetime.now(tz=pytz.timezone('US/Pacific')) - datetime.timedelta(days=x)
     url = 'http://web6.seattle.gov/SDOT/wapiParkingStudy/api/ParkingTransaction?from='+ date.strftime('%m%d%Y') + '&to=' + date.strftime('%m%d%Y')
     r = requests.get(url)
@@ -34,7 +34,7 @@ for x in xrange(2):
             logging.error(traceback.format_exc())
 
     db.commit()
+    logging.info('inserted: ' + str(inserted))
+    logging.info('duplicates: ' + str(duplicates))
 db.close()
 
-logging.info('inserted: ' + str(inserted))
-logging.info('duplicates: ' + str(duplicates))

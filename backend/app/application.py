@@ -60,15 +60,15 @@ def get_paystations_in_radius():
     maxlon = lon + math.degrees(rad/R/math.cos(math.radians(lat)))
     minlon = lon - math.degrees(rad/R/math.cos(math.radians(lat)))
 
-    query = "SELECT element_key, latitude, longitude, max_occupancy, \
-                acos(sin({0})*sin(radians(latitude)) + cos({0})*cos(radians(latitude))*cos(radians(longitude)-{1})) * {2} AS D \
+    query = "SELECT *, \
+                acos(sin({0})*sin(radians(latitude_avg)) + cos({0})*cos(radians(latitude_avg))*cos(radians(longitude_avg)-{1})) * {2} AS D \
             FROM ( \
                 SELECT* \
-                FROM pay_stations\
-                WHERE latitude BETWEEN {3} AND {4} \
-                  AND longitude BETWEEN {5} AND {6} \
+                FROM blockfaces\
+                WHERE latitude_avg BETWEEN {3} AND {4} \
+                  AND longitude_avg BETWEEN {5} AND {6} \
             ) AS firstcut \
-            WHERE acos(sin({0})*sin(radians(latitude)) + cos({0})*cos(radians(latitude))*cos(radians(longitude)-{1})) * {2} < {7} \
+            WHERE acos(sin({0})*sin(radians(latitude_avg)) + cos({0})*cos(radians(latitude_avg))*cos(radians(longitude_avg)-{1})) * {2} < {7} \
             ORDER BY D"
     cur.execute(query.format(math.radians(lat), math.radians(lon), R, minlat, maxlat, minlon, maxlon, rad))
     ret = {}

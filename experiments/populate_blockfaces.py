@@ -11,9 +11,10 @@ for k,v in occupancies.iteritems():
     blockface = blockfaces.get(int(k), None)
     if blockface:
         try:
-            avg_lon = (blockface[0] + blockface[2])/2
-            avg_lat = (blockface[1] + blockface[3])/2
-            command = "INSERT INTO blockfaces (element_key, longitude_1, latitude_1, longitude_2, latitude_2, longitude_avg, latitude_avg, max_occupancy) VALUES(" + str(k) + ", " + str(blockface[0]) + ", " + str(blockface[1]) + ", " + str(blockface[2]) + ", " + str(blockface[3]) + ", " + str(avg_lon) + ", " + str(avg_lat) + ', ' + str(v) + ");"
+            avg_lon = (float(blockface[0][0]) + float(blockface[1][0]))/2
+            avg_lat = (float(blockface[0][1]) + float(blockface[1][1]))/2
+            command = "INSERT INTO blockfaces (element_key, longitude_1, latitude_1, longitude_2, latitude_2, longitude_avg, latitude_avg, max_occupancy) VALUES(" + str(k) + ", " + str(blockface[0][0]) + ", " + str(blockface[0][1]) + ", " + str(blockface[1][0]) + ", " + str(blockface[1][1]) + ", " + str(avg_lon) + ", " + str(avg_lat) + ', ' + str(v) + ");"
+            print command
             cursor.execute(command)
         except MySQLdb.IntegrityError:
             pass

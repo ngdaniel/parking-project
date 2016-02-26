@@ -194,26 +194,23 @@ $(function() {
 				markAndCircle(latLng, searchRadius, map);
 				//Loop over each datapoint(payStation)
 				nearestPayStation = null;
-                nearestPayStation = null;
                 $.each(data, function(index) {
 					payStationItem = data[index];
 					console.log(payStationItem);
 					idNumber = index;
-                    for (var key in payStationItem) {
-						meterLat = payStationItem[0];
-						meterLong = payStationItem[1];
-						meterMaxOcc = payStationItem[2];
-						distance = payStationItem[3];
-                        if(nearestPayStation == null){
-                            nearestPayStation = payStationItem;
-                            nearestPayStationID = idNumber; 
-                        }
-						else if(nearestPayStation[3] > payStationItem[3]){
-                            console.log(payStationItem[3]);
-						    nearestPayStation = payStationItem;
-						    nearestPayStationID= idNumber;
-                        }
-					}
+                    meterLat = payStationItem[5];
+                    meterLong = payStationItem[4];
+                    meterMaxOcc = payStationItem[6];
+                    distance = payStationItem[7];
+                    if(nearestPayStation == null){
+                        nearestPayStation = payStationItem;
+                        nearestPayStationID = idNumber; 
+                    }
+                    else if(nearestPayStation[7] > distance){
+                        console.log(distance);
+                        nearestPayStation = payStationItem;
+                        nearestPayStationID = idNumber;
+                    }
 					//Adds marker and infowindow  + click listners for each payStation
 					var marker = new google.maps.Marker({
 						position: new google.maps.LatLng(meterLat, meterLong),

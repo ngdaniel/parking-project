@@ -10,9 +10,12 @@ for child in root.findall('.//{http://www.opengis.net/kml/2.2}SimpleData'):
     d=child.attrib
     if d['name']=='ELMNTKEY':
         idd.append(int(child.text))
-crd = pickle.load(open('datastore/allblocks.p'))
-    #coords = c[0].split()
-    #crd.append([coords[0].split(','), coords[1].split(',')])
+#crd = pickle.load(open('datastore/allblocks.p'))
+    
+
+for child in root.findall('.//{http://www.opengis.net/kml/2.2}coordinates'):
+    coords = child.text.split()
+    crd.append([coord.split(',') for coord in coords])
 #crd_=[[float(i) for i in y[0].split().split(',')] for y in crd]
 #for y in crd:
 #  s=y[0].split(',')
