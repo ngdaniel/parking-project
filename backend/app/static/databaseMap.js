@@ -10,16 +10,8 @@ String.prototype.format = function() {
 
 //On document creation adds click event handler to forms
 $(function() {
-	$('#getGpsLocation').bind('click', function() {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(function(data) {
-				$('input[name="latitudeOrigin"]').val(data.coords.latitude);
-				$('input[name="longitudeOrigin"]').val(data.coords.longitude);
-			})
-		} else {
-			alert("Geolocation is not supported by this browser.");
-		}
-		return false;
+	$('#getGpsLocation').bind('', function() {
+			return false;
 	});
 
     	//////////////////////////////////////////////////////////////
@@ -80,13 +72,28 @@ $(function() {
 
 	var driveCoordinates = [];
 	var drivePath;
-	    
+    var originLat;
+    var originLon;    
     $('#routeToLocation').bind('click', function() {
+
+        if($('input[name=src]:checked').val()=='gps'){
+           if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(data) {
+                        originLat = data.coords.latitude;
+                        originLon = data.coords.longitude;
+                        console.log(originLat);
+                        console.log(originLon);
+                    })
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+       }
+        
+        console.log(originLat);
+        console.log(originLon);
         destinationLat= nearestPayStation[0];
         destinationLon= nearestPayStation[1];
-        originLat = $('input[name="latitudeOrigin"]').val();
-		originLon= $('input[name="longitudeOrigin"]').val();
-        
+        /*
         directionsService.route({
             origin: new google.maps.LatLng(originLat,originLon),
             destination: new google.maps.LatLng(destinationLat,destinationLon),
@@ -100,15 +107,22 @@ $(function() {
                 window.alert('Directions request faield due to ' + status);
             }
         });
-        
+       */ 
       
       directionsServiceBus.route({
             origin: new google.maps.LatLng(originLat,originLon),
             destination: new google.maps.LatLng(destinationLat,destinationLon),
-            travelMode: google.maps.TravelMode.TRANSIT
+            travelMode: google.maps.TravelMode.TRANSIT,
+            provideRouteAlternatives:true
         }, function (response,status){
             if(status == google.maps.DirectionsStatus.OK){
+                console.log(response)
+                $.each(response.routes, function(index,route ){
+                console.log(route);
+                });
                 directionsDisplayBus.setDirections(response);
+                
+
             }
             else{
                 window.alert('Directions request faield due to ' + status);
