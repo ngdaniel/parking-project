@@ -79,13 +79,18 @@ $(function() {
 		lat: 47.60801,
 		lng: -122.335167
 	};
+    //destination
 	var nearestPayStation;
     var nearestPayStationID;
 
 	var	searchRadius = .25;
     var autoSrc;
     var autoDst;
-	//Creates map over seattle and adds click dlistener
+    
+    var autoDstLocation;
+    var autoSrcLocation;
+	
+    //Creates map over seattle and adds click dlistener
 	window.initMap = function() {
 	   map = new google.maps.Map(document.getElementById('map'), {
 			center: {
@@ -107,52 +112,76 @@ $(function() {
 
        
        directionsService  = new google.maps.DirectionsService; 
-        directionsServiceBus = new google.maps.DirectionsService;
-        directionsDisplay = new google.maps.DirectionsRenderer;
-        directionsDisplayBus = new google.maps.DirectionsRenderer;
+       directionsServiceBus = new google.maps.DirectionsService;
+       directionsDisplay = new google.maps.DirectionsRenderer;
+       directionsDisplayBus = new google.maps.DirectionsRenderer;
        directionsDisplay.setMap(map);
        directionsDisplay.setPanel(document.getElementById('drivingDirections'));
        directionsDisplayBus.setMap(map);
        directionsDisplayBus.setPanel(document.getElementById('busDirections'));
 
     //TODO: Fix autocomplete
-       autoSrc  = new google.maps.places.Autocomplete(/** @type {!HTMLInputElement} */ (document.getElementById("dirSrc")));
-       autoDst = new google.maps.places.Autocomplete(/** @type {!HTMLInputElement} */  (document.getElementById("dirDst")));
-       
+     var srcInput = /** @type {!HTMLInputElement} */ (document.getElementById("dirSrc"));
+     var dstInput = /** @type {!HTMLInputElement} */  (document.getElementById("dirDst"));
+       autoSrc  = new google.maps.places.Autocomplete(srcInput);
+       autoDst = new google.maps.places.Autocomplete(dstInput);
+    
+    //Grab location from Source Auto Search when changed        
+    autoSrc.addListener('place_changed', function() {
+        var place = autoSrc.getPlace();
+        if (!place.geometry) {
+          window.alert("Autocomplete's returned place contains no geometry");
+          return;
+        }else{
+            autoSrcLocation = place['formatted_address'];
+        }
+    });
 
+    //Grab location from Destination Auto Search when changed
+    autoDst.addListener('place_changed', function() {
+            var place = autoDst.getPlace();
+            if (!place.geometry) {
+              window.alert("Autocomplete's returned place contains no geometry");
+              return;
+            }else{
+                autoDstLocation = place['formatted_address'];
+            }
+        });
 		
     $('#routeToLocation').bind('click', function() {
-            destinationLat= nearestPayStation[1];
-            destinationLon= nearestPayStation[0];
+            //Set desintationSpot Value
+            var destinationSpot;
+             if($('input[name=dst]:checked').val()=='marker'){
+                destinationLat= nearestPayStation[1];
+                destinationLon= nearestPayStation[0];
+                destinationSpot = new google.maps.LatLng(destinationLat,destinationLon);
+            }else if ($('input[name=dst]:checked').val()=='searchDst'){
+                destinationSpot = autoDstLocation;  
+            }
+            //Set SourceSpot Value
             if($('input[name=src]:checked').val()=='gps'){
                if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(function(data) {
-                            originLat = data.coords.latitude;
-                            originLon = data.coords.longitude;
-                            
-                            directions(directionsServiceBus,directionsDisplayBus,google.maps.TravelMode.TRANSIT);
-                            directions(directionsService,directionsDisplay,google.maps.TravelMode.DRIVING);
+                            originSpot = new google.maps.LatLng(data.coords.latitude,data.coords.longitude);
                         })
                     } else {
                         alert("Geolocation is not supported by this browser.");
                     }
-           }else{
-                console.log(autoDst);
-                 var places = autoDst.getPlace();
-                 console.log(places);
-                 console.log(places.geometry.location);
-                  originLat = data.coords.latitude;
-                  originLon = data.coords.longitude;
-                  directions(directionsService,google.maps.TravelMode.DRIVING);
-                  directions(directionsServiceBus,google.maps.TravelMode.TRANSIT);
+           }else if($('input[name=src]:checked').val()=='searchSrc'){
+                  originSpot = autoSrcLocation;  
            }
+
+          directions(directionsServiceBus,directionsDisplayBus,originSpot,destinationSpot,google.maps.TravelMode.TRANSIT);
+          directions(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING);
+       
+
             console.log("orgin: {},{} and destination {},{}".format(originLat,originLon,destinationLat,destinationLon));
         });
 
-   function directions(directionsService,directionsDisplayer,mode){
-      directionsServiceBus.route({
-            origin: new google.maps.LatLng(originLat,originLon),
-            destination: new google.maps.LatLng(destinationLat,destinationLon),
+   function directions(directionsService,directionsDisplayer,originSpot,destSpot,mode){
+      directionsService.route({
+            origin: originSpot,
+            destination: destSpot,
             travelMode: mode,
             provideRouteAlternatives:true
         }, function (response,status){
@@ -162,8 +191,6 @@ $(function() {
                 console.log(route);
                 });
                 directionsDisplayer.setDirections(response);
-                
-
             }
             else{
                 window.alert('Directions request faield due to ' + status);
