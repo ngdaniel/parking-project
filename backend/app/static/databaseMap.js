@@ -122,51 +122,6 @@ $(function() {
   }
 ////////////////////////////////////////////////////////////////////////////////
 
-  var driveCoordinates = [];
-  var drivePath;
-
-  $('#routeToLocation').bind('click', function() {
-    destinationLat = nearestPayStation[0];
-    destinationLon = nearestPayStation[1];
-    originLat = $('input[name="latitudeOrigin"]').val();
-    originLon = $('input[name="longitudeOrigin"]').val();
-
-    directionsService.route({
-      origin: new google.maps.LatLng(originLat, originLon),
-      destination: new google.maps.LatLng(destinationLat, destinationLon),
-      travelMode: google.maps.TravelMode.DRIVING,
-      provideRouteAlternatives: true
-    }, function(response, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-        directionsDisplay.setDirections(response);
-      } else {
-        window.alert('Directions request faield due to ' + status);
-      }
-    });
-
-
-    directionsServiceBus.route({
-      origin: new google.maps.LatLng(originLat, originLon),
-      destination: new google.maps.LatLng(destinationLat, destinationLon),
-      travelMode: google.maps.TravelMode.TRANSIT
-    }, function(response, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-        directionsDisplayBus.setDirections(response);
-      } else {
-        window.alert('Directions request faield due to ' + status);
-      }
-    });
-
-  });
-
-
-  function addLine() {
-    drivePath.setMap(map);
-  }
-
-  function removeLine() {
-    drivePath.setMap(null);
-  }
   //!!@!@!?@!?@?!@?!?///
   var map;
   var directionsService;
@@ -181,9 +136,13 @@ $(function() {
   };
   var nearestPayStation;
   var nearestPayStationID;
-
+  var gpsLat;
+  var gpsLng;
+  var searchRadius =.25;
   var autoSrc;
   var autoDst;
+  var autoDstLocation;
+  var autoSrcLocation;
   //Creates map over seattle and adds click dlistener
   window.initMap = function() {
     directionsService = new google.maps.DirectionsService();
@@ -205,23 +164,104 @@ $(function() {
         position: google.maps.ControlPosition.TOP_RIGHT
       },
     });
+    
+    map.addListener('click', function(e) {
+      placeMarkerAndFindPayStations(e.latLng, map);
+    });
+
+
+    
+    directionsService  = new google.maps.DirectionsService; 
+    directionsServiceBus = new google.maps.DirectionsService;
+    directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplayBus = new google.maps.DirectionsRenderer;
     directionsDisplay.setMap(map);
     directionsDisplay.setPanel(document.getElementById('drivingDirections'));
     directionsDisplayBus.setMap(map);
     directionsDisplayBus.setPanel(document.getElementById('busDirections'));
 
     autoSrc = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirSrc")));
-
-
-    autoDest = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirDst")));
-
-
-
-    map.addListener('click', function(e) {
-      placeMarkerAndFindPayStations(e.latLng, map);
+    autoDst = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirDst")));
+    
+    //Grab location from Source Auto Search when changed        
+    autoSrc.addListener('place_changed', function() {
+        var place = autoSrc.getPlace();
+        if (!place.geometry) {
+          window.alert("Autocomplete's returned place contains no geometry");
+          return;
+        }else{
+            console.log(place);
+            autoSrcLocation = place['formatted_address'];
+        }
     });
 
-    //Gets data points from library and plots the markers
+    //Grab location from Destination Auto Search when changed
+    autoDst.addListener('place_changed', function() {
+            var place = autoDst.getPlace();
+            if (!place.geometry) {
+              window.alert("Autocomplete's returned place contains no geometry");
+              return;
+            }else{
+                console.log(place);
+                autoDstLocation = place['formatted_address'];
+            }
+        });
+
+ //Checks which boxes are checked and takes the destination and source 
+    //If they are filled out , then directions will be drawn
+    $('#routeToLocation').bind('click', function() {
+            //Set desintationSpot Value
+            var destinationSpot;
+             if($('input[name=dst]:checked').val()=='marker'){
+                destinationLat= nearestPayStation[1];
+                destinationLon= nearestPayStation[0];
+                destinationSpot = new google.maps.LatLng(destinationLat,destinationLon);
+            }else if ($('input[name=dst]:checked').val()=='searchDst'){
+                destinationSpot = autoDstLocation;  
+            }
+            //Set SourceSpot Value
+           var originSpot;
+           if($('input[name=src]:checked').val()=='gps'){
+               if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(data) {
+                            originlat = data.coords.latitude;
+                            originlng = data.coords.longitude;
+                            originSpot = new google.maps.LatLng(originlat,originlng);
+                          directions(directionsServiceBus,directionsDisplayBus,originSpot,destinationSpot,google.maps.TravelMode.TRANSIT);
+                          directions(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING);
+ 
+                    })
+                    } else {
+                        alert("Geolocation is not supported by this browser.");
+                    }
+           }else if($('input[name=src]:checked').val()=='searchSrc'){
+                  originSpot = autoSrcLocation;  
+                   directions(directionsServiceBus,directionsDisplayBus,originSpot,destinationSpot,google.maps.TravelMode.TRANSIT);
+                  directions(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING); 
+        }
+        });
+
+   function directions(directionsService,directionsDisplayer,originSpot,destSpot,mode){
+      directionsService.route({
+            origin: originSpot,
+            destination: destSpot,
+            travelMode: mode,
+            provideRouteAlternatives:true
+        }, function (response,status){
+            if(status == google.maps.DirectionsStatus.OK){
+                console.log(response)
+                $.each(response.routes, function(index,route ){
+                console.log(route);
+                });
+                directionsDisplayer.setDirections(response);
+            }
+            else{
+                window.alert('Directions request faield due to ' + status);
+            }
+        });
+   }
+
+        //Gets data points from library and plots the markers
     //radius is gotten from textBox, default is 250m
     function placeMarkerAndFindPayStations(latLng, map) {
       clearMap();
@@ -283,9 +323,6 @@ $(function() {
     function clearMap() {
       for (var i = 0; i < markersList.length; i++) {
         markersList[i].setMap(null);
-      }
-      if (drivePath) {
-        removeLine();
       }
       infoWindowList = [];
       markersList = [];

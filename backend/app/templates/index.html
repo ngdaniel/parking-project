@@ -1,27 +1,34 @@
 {% extends "layout.html" %}
 {% block body %}
 
+   <div id="nav">
+        <h1>Source</h1>
+        A : <input type='text' size=20 id='dirSrc'placeholder="Enter a Location" autocomplete="off"><br>
+        <input type ="radio" name = "src" value="searchSrc"> SearchBox 
+        <input type ="radio" id ="getGPSLocation" name = "src" value="gps" marked> Use Current GPS <br>
 
-    <div id="nav">
-        Current Latitude : <input type="text" size=20 name="latitudeOrigin"><br>
-        Current Longitude: <input type="text" size=20 name="longitudeOrigin"><br>
-        <button id=getGpsLocation>Use current GPS </button><br>
-        <h1>[OR]</h1>
-        A : <input type="text" size=20 id="dirSrc"><br>
-        B : <input type="text" size=20 id="dirDst"><br>
 
-        <button id=routeToLocation>Route to map marker </button><br>
+       
+        <h1>Destination </h1>
+
+        B : <input type='text' size=20 id='dirDst'placeholder="Enter a Location" autocomplete="off"><br>
+        <input type ="radio" name = "dst" value="searchDst" > Search Box 
+        <input type ="radio" name = "dst" value="marker">Use Map Marker<br>
+       
+       
+       <br><br>
+  
         <br>Unix Timestamp:<input type="text" size=20 name="timestamp"><br>
         <button id=searchTime>Show densities</button>
         <button id=showLines>Show lots</button>
         <button id=refresh>Clear Lines</button>
+        <button id=routeToLocation>Route to Destination </button>
+ 
+
 
         <div id ="busDirections"></div>
-        <div id ="drivingDirections">
-        </div>
-   </div>
+        <div id ="drivingDirections"></div>
+    </div>
     <div id="map"></div>
-
-
 
 {% endblock %}
