@@ -37,13 +37,14 @@ $(function() {
   document.getElementById("searchTime").onclick = function() {
       var timestamp = $('input[name="timestamp"]').val();
       if(!timestamp) {
-        timestamp = Date.now() / 1000 | 0; // current unix time
+        timestamp = 1455290482; //Date.now() / 1000 | 0; // current unix time
       }  // showDensities(1451649600); 1455290482
       showDensities(timestamp);
   };
   document.getElementById("refresh").onclick = function() {
     console.log('Refreshing...');
     location.reload();
+  };
 
   // Places line (with color and thinckness weighted)
   function drawLine(coords, color, size) {
