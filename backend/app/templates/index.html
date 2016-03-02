@@ -2,29 +2,26 @@
 {% block body %}
 
    <div id="nav">
-        <h1>Source</h1>
-        A : <input type='text' size=20 id='dirSrc'placeholder="Enter a Location" autocomplete="off"><br>
-        <input type ="radio" name = "src" value="searchSrc"> SearchBox 
+        <h3>Source</h3>
+        A : <input type="text" size="20" id="dirSrc" placeholder="Enter a Location" autocomplete="off"><br>
+        <input type ="radio" name = "src" value="searchSrc"> SearchBox <br>
         <input type ="radio" id ="getGPSLocation" name = "src" value="gps" marked> Use Current GPS <br>
+        <hr>
 
-
-       
-        <h1>Destination </h1>
-
-        B : <input type='text' size=20 id='dirDst'placeholder="Enter a Location" autocomplete="off"><br>
-        <input type ="radio" name = "dst" value="searchDst" > Search Box 
+        <h3>Destination </h3>
+        B : <input type="text" size="20" id="dirDst" placeholder="Enter a Location" autocomplete="off"><br>
+        <input type ="radio" name = "dst" value="searchDst" > Search Box <br>
         <input type ="radio" name = "dst" value="marker">Use Map Marker<br>
-       
-       
-       <br><br>
-  
-        <br>Unix Timestamp:<input type="text" size=20 name="timestamp"><br>
-        <button id=searchTime>Show densities</button>
-        <button id=showLines>Show lots</button>
-        <button id=refresh>Clear Lines</button>
-        <button id=routeToLocation>Route to Destination </button>
- 
+        <hr>
 
+        <h3>Parking Load </h3>
+        <button id="showLines">Show lots</button>
+        <button id="refresh">Clear Lines</button><br>
+        <br>Unix Timestamp:<input type="text" size="20" id="timestamp" value="" placeholder="Default 1455290482" autocomplete="off"><br>
+        <br>Date:  <input type="date" step="1" min="2015-01-01" id="date">
+        <br>Time: <input type="time" min="1:00" max="24:00" step="900" id="time">
+        <button id="searchTime">Show densities</button><br>
+        <div class="content"><span class="value"></span></div>
 
         <div id ="busDirections"></div>
         <div id ="drivingDirections"></div>
