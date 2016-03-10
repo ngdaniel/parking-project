@@ -171,18 +171,21 @@ $(function() {
   var nearestPayStationID;
   var gpsLat;
   var gpsLng;
-  var searchRadius = 0.25;
+  var searchRadius = parseInt($("#searchRadius").val());
+   $("#curRadius").html(searchRadius);
   var autoSrc;
   var autoDst;
   var autoDstLocation;
   var autoSrcLocation;
+  var polylineList = [];
+  var detailsPanel = $("#directions_panel");
+  var summaryPanel = $("#summary_panel");
+
+
   //Creates map over seattle and adds click dlistener
   window.initMap = function() {
     directionsService = new google.maps.DirectionsService();
-    directionsServiceBus = new google.maps.DirectionsService();
     directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplayBus = new google.maps.DirectionsRenderer();
-
 
     map = new google.maps.Map(document.getElementById('map'), {
       center: {
@@ -205,13 +208,9 @@ $(function() {
 
 
     directionsService  = new google.maps.DirectionsService;
-    directionsServiceBus = new google.maps.DirectionsService;
     directionsDisplay = new google.maps.DirectionsRenderer;
-    directionsDisplayBus = new google.maps.DirectionsRenderer;
     directionsDisplay.setMap(map);
     directionsDisplay.setPanel(document.getElementById('drivingDirections'));
-    directionsDisplayBus.setMap(map);
-    directionsDisplayBus.setPanel(document.getElementById('busDirections'));
 
     autoSrc = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirSrc")));
     autoDst = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirDst")));
@@ -227,6 +226,12 @@ $(function() {
             autoSrcLocation = place['formatted_address'];
         }
     });
+    
+    $("#searchRadius").change( function(){
+        searchRadius = parseInt($(this).val()); 
+        $("#curRadius").html(searchRadius);
+        console.log("search radius =" + searchRadius);
+    });
 
     //Grab location from Destination Auto Search when changed
     autoDst.addListener('place_changed', function() {
@@ -240,7 +245,7 @@ $(function() {
             }
         });
 
- //Checks which boxes are checked and takes the destination and source
+     //Checks which boxes are checked and takes the destination and source
     //If they are filled out , then directions will be drawn
     $('#routeToLocation').bind('click', function() {
             //Set desintationSpot Value
@@ -260,19 +265,142 @@ $(function() {
                             originlat = data.coords.latitude;
                             originlng = data.coords.longitude;
                             originSpot = new google.maps.LatLng(originlat,originlng);
-                          directions(directionsServiceBus,directionsDisplayBus,originSpot,destinationSpot,google.maps.TravelMode.TRANSIT);
-                          directions(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING);
-
-                    });
+                     //     directions(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING);
+ 
+                          directionsExp(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING);
+                    })
                     } else {
                         alert("Geolocation is not supported by this browser.");
                     }
            }else if($('input[name=src]:checked').val()=='searchSrc'){
-                  originSpot = autoSrcLocation;
-                   directions(directionsServiceBus,directionsDisplayBus,originSpot,destinationSpot,google.maps.TravelMode.TRANSIT);
-                  directions(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING);
+                 originSpot = autoSrcLocation;  
+                  directionsExp(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING);
+             
+            //  directions(directionsService,directionsDisplay,originSpot,destinationSpot,google.maps.TravelMode.DRIVING); 
         }
         });
+
+      var polyline = new google.maps.Polyline({
+         path: [],
+         geodesic: true,
+         strokeColor: '#FF0000',
+         strokeOpacity: 1.0,
+         strokeWeight: 2
+       });      
+          function directionsExp(directionsService,directionsDisplayer,originSpot,destSpot,mode){
+          directionsService.route({
+                origin: originSpot,
+                destination: destSpot,
+                travelMode: mode,
+                provideRouteAlternatives:true
+            },  
+            function (response,status){
+                if (status == google.maps.DirectionsStatus.OK) {
+                    console.log(response)
+                    var bounds = new google.maps.LatLngBounds();
+                    var summaryList = [];
+                    var detailsList = [];
+                    var startLocation = new Object();
+                    var endLocation = new Object();
+                    var routeList = [];
+                    clearDirectionsPanel();   
+                    //do route logic here and loop over the route array
+                    $.each(response.routes, function(index, routeOption){
+                        routeList.push(routeOption); 
+                    });
+                     console.log(routeList); 
+                    
+                    $.each(routeList, function(index,route){
+                        console.log(route);
+                        //Route Summary at the top of the page
+                        var $div = $("<div>",{id :"foo", class : "directionsBox"});
+                        $div.data("directions",index);
+                        
+                        //show route information associated when div clicked on 
+                        $div.click(function(){
+                            clearPolyLines();
+                            directionsNumber = jQuery(this).data('directions');
+                            detailsPanel.html(detailsList[directionsNumber].html());
+                            polylineList[directionsNumber].setMap(map);
+                       });
+                       $.each(route.legs, function(routeNumber,routeSegment){
+                            $div.append( "<b>Route Segment: " + (index + 1) +" :  "+ route.summary +"</b><br />");
+                            $div.append( routeSegment.start_address + " to ");
+                            $div.append( routeSegment.end_address + "<br />");
+                            $div.append(  routeSegment.distance.text + "<br /><br />");
+                       });
+                       //storing the divs inside an array to mess with later
+                    summaryList[index] = $div
+                    summaryPanel.append($div);
+
+
+                    //Pathing
+                        var path = route.overview_path;
+                        var legs = route.legs;
+                        var $directions = $("<div>",{id :"foo", class : "fee"});
+                        $directions.append("<ul>");
+                        $div.click(function(){
+                        //hide the other content
+                        //s
+                        });
+                        for (i=0;i<legs.length;i++) {
+                            if (i == 0) { 
+                                startLocation.latlng = legs[i].start_location;
+                                startLocation.address = legs[i].start_address;
+                                startLocation.marker = createMarker(legs[i].start_location,"start",legs[i].start_address,"green");
+                            }
+                             endLocation.latlng = legs[i].end_location;
+                             endLocation.address = legs[i].end_address;
+                             var steps = legs[i].steps;
+                            var polyline = new google.maps.Polyline({
+                                 path: [],
+                                 geodesic: true,
+                                 strokeColor: '#FF0000',
+                                 strokeOpacity: 1.0,
+                                 strokeWeight: 2
+                               }); 
+                             for (j=0;j<steps.length;j++) {
+                                 var nextSegment = steps[j].path;
+                                 $directions.append( "<li>"+steps[j].instructions);
+                                 var dist_dur = "";
+                                 if (steps[j].distance && steps[j].distance.text) dist_dur += "&nbsp;"+steps[j].distance.text;
+                                 if (steps[j].duration && steps[j].duration.text) dist_dur += "&nbsp;"+steps[j].duration.text;
+                                 if (dist_dur != "") {
+                                     $directions.append( "("+dist_dur+")<br /></li>");
+                                 } else {
+                                     $directions.append( "</li>");
+                                 }
+
+                                 for (k=0;k<nextSegment.length;k++) {
+                                     polyline.getPath().push(nextSegment[k]);
+                                     bounds.extend(nextSegment[k]);
+                                 }
+                              }
+                        }
+                        //polyline.setMap(map);
+                        $directions.append("</ul>");
+                        detailsList[index] = $directions;  
+                        polylineList[index] = polyline; 
+                        map.fitBounds(bounds);
+                        endLocation.marker = createMarker(endLocation.latlng,"end",endLocation.address,"red");
+        
+                    })   
+                }else alert(status);
+            })
+   }
+
+
+
+  function createMarker(placement,title,adress,color){
+    var marker = new google.maps.Marker({
+        position: placement,
+        map: map,
+        icon:'http://maps.google.com/mapfiles/ms/icons/'+color+'-dot.png'  ,
+        title:title 
+      });
+      markersList.push(marker);
+  
+  }
 
    function directions(directionsService,directionsDisplayer,originSpot,destSpot,mode){
       directionsService.route({
@@ -298,12 +426,11 @@ $(function() {
     //radius is gotten from textBox, default is 250m
     function placeMarkerAndFindPayStations(latLng, map) {
       clearMap();
-      searchRadius = 0.25;
       //Queries python API for datapoints
       $.getJSON($SCRIPT_ROOT + '/paystations_in_radius', {
         latitude: latLng.lat,
         longitude: latLng.lng,
-        radius: searchRadius
+        radius: searchRadius/1000
       }, function(data) {
         // console.log(data);
         markAndCircle(latLng, searchRadius, map);
@@ -351,6 +478,37 @@ $(function() {
       });
       return false;
     }
+	// Clears the map of markers
+	function clearMap() {
+        clearLines();	
+	    clearMarkers();
+	    clearPolyLines();
+        polylineList = [];
+        infoWindowList = [];
+	}
+    // Make directions empty again 
+      function clearDirectionsPanel(){
+            summaryPanel.html('') ;
+            detailsPanel.html('');
+      }
+    function clearMarkers(){
+        for (var i = 0; i < markersList.length; i++) {
+                markersList[i].setMap(null);
+            }
+		markersList = [];
+    }
+
+    function clearLines(){
+        for (var j = 0; j < lineList.length; j++) {
+            lineList[j].setMap(null);
+        }
+		lineList = [];
+    }
+    function clearPolyLines(){
+        for (var j = 0; j < polylineList.length; j++) {
+                polylineList[j].setMap(null);
+            }
+    }
 
     //takes a latLong object , radius , and map
     //draws a maker and circle around point
@@ -367,7 +525,7 @@ $(function() {
         fillOpacity: 0.35,
         map: map,
         center: searchCoord,
-        radius: searchRadius * 1000 //radius is in meters
+        radius: searchRadius //radius is in meters
       });
       destination.lat = searchCoord.lat;
       destination.lng = searchCoord.lng;
@@ -376,17 +534,5 @@ $(function() {
       markersList.push(cityCircle);
     }
   };
-	// Clears the map of markers
-	function clearMap() {
-		for (var j = 0; j < lineList.length; j++) {
-			lineList[j].setMap(null);
-		}
-		for (var i = 0; i < markersList.length; i++) {
-			markersList[i].setMap(null);
-		}
 
-		infoWindowList = [];
-		markersList = [];
-		lineList = [];
-	}
 });

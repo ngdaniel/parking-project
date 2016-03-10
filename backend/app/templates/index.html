@@ -5,15 +5,16 @@
         <h3>Source</h3>
         A : <input type="text" size="20" id="dirSrc" placeholder="Enter a Location" autocomplete="off"><br>
         <input type ="radio" name = "src" value="searchSrc"> SearchBox <br>
-        <input type ="radio" id ="getGPSLocation" name = "src" value="gps" marked> Use Current GPS <br>
+        <input type ="radio" id ="getGPSLocation" name = "src" value="gps" checked> Use Current GPS <br>
         <hr>
 
         <h3>Destination </h3>
         B : <input type="text" size="20" id="dirDst" placeholder="Enter a Location" autocomplete="off"><br>
         <input type ="radio" name = "dst" value="searchDst" > Search Box <br>
-        <input type ="radio" name = "dst" value="marker">Use Map Marker<br>
+        <input type ="radio" name = "dst" value="marker" checked>Use Map Marker<br>
         <hr>
-
+        Search Radius: <span id="curRadius"></span>Meters <br>
+        <input type="range" id="searchRadius"  min="0" max="1000" value ="250" /> <br>
         <button id=routeToLocation>Route to Destination </button>
         <br>
         <h3>Parking Load </h3>
@@ -27,7 +28,9 @@
 
         <div id ="busDirections"></div>
         <div id ="drivingDirections"></div>
-
+        
+        <div id ="summary_panel"></div>
+        <div id ="directions_panel"></div>
     </div>
     <div id="map"></div>
 
