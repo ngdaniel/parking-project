@@ -3,20 +3,30 @@
 
    <div id="nav">
         <h3>Source</h3>
+        <button id=gps>gps </button>
+
         A : <input type="text" size="20" id="dirSrc" placeholder="Enter a Location" autocomplete="off"><br>
+        
+        <!--
         <input type ="radio" name = "src" value="searchSrc"> SearchBox <br>
         <input type ="radio" id ="getGPSLocation" name = "src" value="gps" checked> Use Current GPS <br>
-        <hr>
+        -->
+    <hr>
 
         <h3>Destination </h3>
         B : <input type="text" size="20" id="dirDst" placeholder="Enter a Location" autocomplete="off"><br>
+        <!--
         <input type ="radio" name = "dst" value="searchDst" > Search Box <br>
         <input type ="radio" name = "dst" value="marker" checked>Use Map Marker<br>
+        -->
         <hr>
         Search Radius: <span id="curRadius"></span>Meters <br>
         <input type="range" id="searchRadius"  min="0" max="1000" value ="250" /> <br>
         <button id=routeToLocation>Route to Destination </button>
         <br>
+
+<!--
+        <script type="text/javascript" src="{{ url_for('static', filename='jake.js') }}"> </script>
         <h3>Parking Load </h3>
         <button id="showLines">Show lots</button>
         <button id="refresh">Clear Lines</button><br>
@@ -25,10 +35,7 @@
         <br>Time: <input type="time" min="1:00" max="24:00" step="900" id="time">
         <button id="searchTime">Show densities</button><br>
         <div class="content"><span class="value"></span></div>
-
-        <div id ="busDirections"></div>
-        <div id ="drivingDirections"></div>
-        
+    -->    
         <div id ="summary_panel"></div>
         <div id ="directions_panel"></div>
     </div>
