@@ -10,7 +10,7 @@ import pandas as pd
 elm_id = 76429
 buffer_size = 50  # days to log before writing file
 start_day = '1-1-2014'
-end_day = '1-4-2014'
+end_day = '1-1-2016'
 path = 'datastore/paystations/'
 
 # Init
