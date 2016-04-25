@@ -7,20 +7,20 @@ import numpy as np
 import pandas as pd
 
 # Settings
-# TODO support a list of ids and output dataframe |timestamp|elm_id(0)|elm_id(2)|...|elm_id(n)|
 elm_id = 76429
-buffer_size = 2  # days to log before writing file
-
+buffer_size = 50  # days to log before writing file
 start_day = '1-1-2014'
 end_day = '1-4-2014'
+path = 'datastore/paystations/'
+
+# Init
+# TODO support a list of ids and output dataframe |timestamp|elm_id(0)|elm_id(2)|...|elm_id(n)|
 start_time = time.time()  # current time for timing script
 last_time = 0
 last_output = ''
-path = 'datastore/paystations/'
 if not os.path.exists(path):
     os.makedirs(path)
 
-# Init
 db = MySQLdb.connect(host="parking.c9q5edmigsud.us-west-2.rds.amazonaws.com",
                      port=3306, user='parking', passwd='sdotpark1ng', db="parking")
 cur = db.cursor()
