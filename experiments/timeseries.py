@@ -8,9 +8,9 @@ import pandas as pd
 
 # Settings
 elm_id = 76429
-buffer_size = 50  # days to log before writing file
+buffer_size = 2  # days to log before writing file
 start_day = '1-1-2014'
-end_day = '1-1-2016'
+end_day = '1-4-2014'
 path = 'datastore/paystations/'
 
 # Init
@@ -71,12 +71,13 @@ def save_data(ts, elm_id, curr_count, day_count):
     output = path + '%s_%d_days_of_%d.d' % (str(elm_id), curr_count, day_count-1) # output path
     print 'Saving to %s' % output
     pickle.dump(ts, open(output, 'wb'))
-    print ts
     try:
         os.remove(last_output)  # remove previous file
         print 'Deleted : %s' % last_output
+
     except OSError:
         pass
+    print ts
     last_output = output
 
 

@@ -9,14 +9,21 @@ from sklearn.ensemble.partial_dependence import plot_partial_dependence
 from matplotlib.pylab import rcParams
 rcParams['figure.figsize'] = 15, 9
 
-# Settings
-data_path = 'datastore/paystations/'
-f = '76429_100_days_of_729.d'
+
 
 # Import pandas dataframe
-def load_data(f, start, end):
+def load_data(f, alt_start='', alt_end=''):
     ts = pd.read_pickle(data_path + f)
     ts = ts.dropna()  # remove nan which are free parking days
+    # Set the date range. alt_start/end is optional
+    if alt_start is '':
+        start = pd.to_datetime(ts.index[0], format='%m-%d-%Y')
+    else:
+        start = pd.to_datetime(alt_start, format='%m-%d-%Y')
+    if alt_end is '':
+        end = pd.to_datetime(ts.index[-1], format='%m-%d-%Y')
+    else:
+        end = pd.to_datetime(alt_end, format='%m-%d-%Y')
     ts = ts[start:end]
     ts.plot(legend=True, kind='area', stacked=False)
     plt.ylabel('Transactions (hrs)')
@@ -96,13 +103,18 @@ def feature_dependence(results, X, x_train):
 
 def main():
     # Init Data
-    start = pd.to_datetime(ts.index[0], format='%m-%d-%Y')
-    end = pd.to_datetime(ts.index[-1], format='%m-%d-%Y')
+    global data_path
+    data_path = 'datastore/paystations/'
+    f = '76429_2014ToNow.d'
+    alt_start = ''  # optional
+    alt_end = '1-1-2016'  # optional
     if len(sys.argv) > 1:
         f = sys.argv[1]
-    ts = load_data(f, start, end)
+
+    ts = load_data(f, alt_start, alt_end)
     X = init_features(ts)  # features considered for prediction
     Y = ts['density']  # variable to predict
+
 
     # Run Model
     model_params = {'n_estimators': 200, 'max_depth': 6,
