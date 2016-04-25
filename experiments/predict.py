@@ -9,10 +9,9 @@ from sklearn.ensemble.partial_dependence import plot_partial_dependence
 from matplotlib.pylab import rcParams
 rcParams['figure.figsize'] = 15, 9
 
+# Settings
 data_path = 'datastore/paystations/'
-model_params = {'n_estimators': 200, 'max_depth': 6,
-                'learning_rate': 0.1, 'loss': 'huber', 'alpha': 0.95}
-
+f = '76429_100_days_of_729.d'
 
 # Import pandas dataframe
 def load_data(f, start, end):
@@ -97,7 +96,6 @@ def feature_dependence(results, X, x_train):
 
 def main():
     # Init Data
-    f = '76429_100_days_of_729.d'
     start = pd.to_datetime(ts.index[0], format='%m-%d-%Y')
     end = pd.to_datetime(ts.index[-1], format='%m-%d-%Y')
     if len(sys.argv) > 1:
@@ -107,6 +105,8 @@ def main():
     Y = ts['density']  # variable to predict
 
     # Run Model
+    model_params = {'n_estimators': 200, 'max_depth': 6,
+                    'learning_rate': 0.1, 'loss': 'huber', 'alpha': 0.95}
     # x_train, y_train, x_test, y_test = train_stochastic(X, Y, 0.8)  # random sample (80% train)
     predict_window = 7  # predict 1 week
     x_train, y_train, x_test, y_test = train_history(X, Y, predict_window)  # train past data
