@@ -1,5 +1,5 @@
 from __future__ import division
-from flask import Flask, Response, request, abort , render_template ,jsonify
+from flask import Flask, Response, request, abort, render_template, jsonify
 from flask.ext.mysql import MySQL
 from flask.ext.cors import CORS
 import json

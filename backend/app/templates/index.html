@@ -1,29 +1,14 @@
 {% extends "layout.html" %}
 {% block body %}
 
-   <div id="nav">
-        <h3>Source</h3>
-        <button id=gps>gps </button>
-
-        A : <input type="text" size="20" id="dirSrc" placeholder="Enter a Location" autocomplete="off"><br>
-        
-        <!--
-        <input type ="radio" name = "src" value="searchSrc"> SearchBox <br>
-        <input type ="radio" id ="getGPSLocation" name = "src" value="gps" checked> Use Current GPS <br>
-        -->
-    <hr>
-
-        <h3>Destination </h3>
-        B : <input type="text" size="20" id="dirDst" placeholder="Enter a Location" autocomplete="off"><br>
-        <!--
-        <input type ="radio" name = "dst" value="searchDst" > Search Box <br>
-        <input type ="radio" name = "dst" value="marker" checked>Use Map Marker<br>
-        -->
-        <hr>
-        Search Radius: <span id="curRadius"></span>Meters <br>
-        <input type="range" id="searchRadius"  min="0" max="1000" value ="250" /> <br>
-        <button id=routeToLocation>Route to Destination </button>
-        <br>
+    <div id="nav">
+        <div id="input">
+            <input type="text" id="dirSrc" placeholder="Starting point" autocomplete="off">
+            <button id=gps>gps </button>
+            <input type="text" id="dirDst" placeholder="Destination" autocomplete="on"><br>
+            Search Radius: <span id="curRadius"></span> Meters <input type="range" id="searchRadius"  min="0" max="1000" value ="250" /> <br>
+            <button id=routeToLocation>Route to best parking location</button>
+        </div>
 
 <!--
         <script type="text/javascript" src="{{ url_for('static', filename='jake.js') }}"> </script>

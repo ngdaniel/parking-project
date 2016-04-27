@@ -8,9 +8,9 @@ cur = db.cursor()
 
 day_counts = {}
 
-for x in xrange(369, 4, -1):
+for x in xrange(1089, 4, -1):
     date = datetime.datetime.now(tz=pytz.timezone('US/Pacific')) - datetime.timedelta(days=x)
-    query = "SELECT element_key, timestamp, duration FROM transactions WHERE date(timestamp) = '{0}';"
+    query = "SELECT element_key, timestamp, duration, count(*) FROM transactions WHERE date(timestamp) = '{0}';"
     cur.execute(query.format(date.strftime('%Y-%m-%d')))
     transactions = cur.fetchall()
     for transaction in transactions:

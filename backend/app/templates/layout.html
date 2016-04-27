@@ -1,13 +1,9 @@
 <!doctype html>
 
-<title>Example</title>
-<script type="text/javascript"
-  src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script type="text/javascript">
-  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-</script>
+<title>Urban Parking</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript"> var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }}; </script>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <script type="text/javascript" src="{{ url_for('static', filename='databaseMap.js') }}"> </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAqwnF0OCYJ6IWqWeUBifZpZ7DsI2UOWcI&callback=initMap">
-    </script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAqwnF0OCYJ6IWqWeUBifZpZ7DsI2UOWcI&callback=initMap"></script>
 {% block body %}{% endblock %}
