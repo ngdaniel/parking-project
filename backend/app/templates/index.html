@@ -3,24 +3,29 @@
 
     <div id="nav">
         <div id="input">
+          <h2> Parking Web App </h2>
+          <h3>Navigation</h3>
+            <button id="gps">Use GPS </button>
             <input type="text" id="dirSrc" placeholder="Starting point" autocomplete="off">
-            <button id=gps>gps </button>
             <input type="text" id="dirDst" placeholder="Destination" autocomplete="on"><br>
             Search Radius: <span id="curRadius"></span> Meters <input type="range" id="searchRadius"  min="0" max="1000" value ="250" /> <br>
-            <button id=routeToLocation>Route to best parking location</button>
+            <button id="routeToLocation">Route to best parking location</button>
         </div>
 
-<!--
-        <script type="text/javascript" src="{{ url_for('static', filename='jake.js') }}"> </script>
-        <h3>Parking Load </h3>
-        <button id="showLines">Show lots</button>
-        <button id="refresh">Clear Lines</button><br>
-        <br>Unix Timestamp:<input type="text" size="20" id="timestamp" value="" placeholder="Default 1455290482" autocomplete="off"><br>
-        <br>Date:  <input type="date" step="1" min="2015-01-01" id="date">
-        <br>Time: <input type="time" min="1:00" max="24:00" step="900" id="time">
-        <button id="searchTime">Show densities</button><br>
-        <div class="content"><span class="value"></span></div>
-    -->    
+        <div id="densities">
+          <script type="text/javascript" src="{{ url_for('static', filename='densities.js') }}"> </script>
+          <h3>Parking Load </h3>
+          <button id="clear">Clear Lines</button>
+          <button id="showLots">Show lots</button><br>
+          <input type="date" step="1" min="2015-01-01" id="date"><br>
+          <input type="time" min="1:00" max="24:00" step="900" id="time">
+          <!-- <br>Epoch: <input type="text" size="20" id="timestamp" value="" placeholder="Default 1455290482" autocomplete="off"><br> -->
+          <br><div class="load"><span class="value"></span></div><br>
+          <button id="searchTime">Show Parking Load</button><br>
+
+        </div>
+
+        <!-- Directions -->
         <div id ="summary_panel"></div>
         <div id ="directions_panel"></div>
     </div>

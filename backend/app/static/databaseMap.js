@@ -66,7 +66,7 @@ $(function() {
             originSpot = place.formatted_address;
         }
     });
-    
+
 
     //Grab location from Destination Auto Search when changed
     autoDst.addListener('place_changed', function() {
@@ -94,7 +94,7 @@ $(function() {
     });
 
     $("#searchRadius").change( function(){
-        searchRadius = parseInt($(this).val()); 
+        searchRadius = parseInt($(this).val());
         $("#curRadius").html(searchRadius);
         console.log("search radius =" + searchRadius);
     });
@@ -112,7 +112,7 @@ $(function() {
          strokeColor: '#FF0000',
          strokeOpacity: 1.0,
          strokeWeight: 2
-    });      
+    });
 
     function directionsExp(directionsService,originSpot,destSpot){
           directionsService.route({
@@ -121,10 +121,10 @@ $(function() {
                 travelMode: google.maps.TravelMode.DRIVING,
                 drivingOptions: {
                     trafficModel: google.maps.TrafficModel.BEST_GUESS,
-                    departureTime: new Date(Date.now() ), 
+                    departureTime: new Date(Date.now() ),
                 },
                 provideRouteAlternatives:true
-            },  
+            },
             function (response, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
                     console.log(response);
@@ -134,20 +134,20 @@ $(function() {
                   	var startLocation = {};
                   	var endLocation = {};
                     var routeList = [];
-                    clearDirectionsPanel();   
+                    clearDirectionsPanel();
                     //do route logic here and loop over the route array
                     $.each(response.routes, function(index, routeOption){
-                        routeList.push(routeOption); 
+                        routeList.push(routeOption);
                     });
-                    console.log(routeList); 
-                    
+                    console.log(routeList);
+
                     $.each(routeList, function(index,route){
                         console.log(route);
                         //Route Summary at the top of the page
                         var $div = $("<div>",{id :"foo", class : "directionsBox"});
                         $div.data("directions",index);
-                        
-                        //show route information associated when div clicked on 
+
+                        //show route information associated when div clicked on
                         $div.click(function(){
                             clearPolyLines();
                             directionsNumber = jQuery(this).data('directions');
@@ -179,7 +179,7 @@ $(function() {
                             //s
                         });
                         for (i=0;i<legs.length;i++) {
-                            if (i === 0) { 
+                            if (i === 0) {
                                 startLocation.latlng = legs[i].start_location;
                                 startLocation.address = legs[i].start_address;
                                 startLocation.marker = createMarker(legs[i].start_location,"start",legs[i].start_address,"green");
@@ -193,7 +193,7 @@ $(function() {
                                  strokeColor: '#FF0000',
                                  strokeOpacity: 1.0,
                                  strokeWeight: 2
-                            }); 
+                            });
                             for (j=0;j<steps.length;j++) {
                                  var nextSegment = steps[j].path;
                                  $directions.append( "<li>"+steps[j].instructions);
@@ -213,11 +213,11 @@ $(function() {
                             }
                         }
                         $directions.append("</ul>");
-                        detailsList[index] = $directions;  
-                        polylineList[index] = polyline; 
+                        detailsList[index] = $directions;
+                        polylineList[index] = polyline;
                         map.fitBounds(bounds);
                         endLocation.marker = createMarker(endLocation.latlng,"end",endLocation.address,"red");
-        
+
                     });
             } else alert(status);
         });
@@ -229,7 +229,7 @@ $(function() {
             draggable: true,
             map: map,
             icon:'http://maps.google.com/mapfiles/ms/icons/'+color+'-dot.png'  ,
-            title:title 
+            title:title
         });
         markersList.push(marker);
     }
@@ -248,6 +248,7 @@ $(function() {
         markAndCircle(latLng, searchRadius, map);
         //Loop over each datapoint(payStation)
         nearestPayStation = null;
+        var nFound = 0;
         $.each(data, function(index) {
             payStationItem = data[index];
             // console.log(payStationItem);
@@ -260,7 +261,7 @@ $(function() {
                 nearestPayStation = payStationItem;
                 nearestPayStationID = idNumber;
             } else if (nearestPayStation[7] > distance) {
-                console.log(distance);
+                // console.log(distance);
                 nearestPayStation = payStationItem;
                 nearestPayStationID = idNumber;
             }
@@ -272,7 +273,7 @@ $(function() {
                 //have different colored parking .png files for busy/notbusy/somewhat busy
             });
             //TODO: Make a better looking Info window
-            infoWindowContent = '<p>Blockface {} has a max capacity {} and is {} km away from destination </p>'.format(idNumber, meterMaxOcc, distance.toFixed(2));
+            infoWindowContent = '<p>Blockface {} has a max capacity {} and is {} m away from destination </p>'.format(idNumber, meterMaxOcc, distance.toFixed(2)*1000);
             var infoWindow = new google.maps.InfoWindow({
                 content: infoWindowContent
             });
@@ -286,10 +287,10 @@ $(function() {
             });
             markersList.push(marker);
             infoWindowList.push(infoWindow);
-
+            nFound++;
         });
         destinationSpot = new google.maps.LatLng(nearestPayStation[5],nearestPayStation[4]);
-        
+        console.log("Found " + nFound + " paystations within range");
         //console.log(nearestPayStation[4]);
     });
     return false;
@@ -297,14 +298,14 @@ $(function() {
 
 	// Clears the map of markers
 	function clearMap() {
-        //clearLines();	
+        //clearLines();
 	    clearMarkers();
 	    clearPolyLines();
         polylineList = [];
         infoWindowList = [];
 	}
 
-    // Make directions empty again 
+    // Make directions empty again
     function clearDirectionsPanel(){
         summaryPanel.html('') ;
         detailsPanel.html('');
@@ -350,4 +351,3 @@ $(function() {
 };
 
 });
-

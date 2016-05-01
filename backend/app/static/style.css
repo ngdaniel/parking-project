@@ -18,20 +18,28 @@ input {
 }
 
 #nav {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    color: #474747;
+    font-size: 11pt;
     z-index: 100;
-    position: absolute; 
+    position: absolute;
     margin: 0px 0px 0px 0px;
     padding: 0px;
     overflow:auto;
     height:inherit;
     width:25%;
-    background-color: #FFFFFF; 
+    background-color: #FFFFFF;
     box-shadow: 5px 0px 3px #888888;
 }
 
 #input {
     padding:5px;
-    margin:0px;
+    margin:2px;
+}
+
+#densities {
+    padding:5px;
+    margin:2px;
 }
 
 #map {
@@ -41,5 +49,5 @@ input {
 
 .directionsBox:hover {
     background-color:blue;
-    cursor:pointer; 
+    cursor:pointer;
 }
