@@ -385,7 +385,6 @@ $(function() {
         markersList.push(cityCircle);
     }
 };
-/*
         function makeChart(){
             chart = c3.generate({
                 bindto: '#chart',
@@ -410,25 +409,6 @@ $(function() {
               }
             });
         }
-*/
-        function makeChart(){
-               chart = c3.generate({
-                    bindto: '#chart',
-                    data: {
-                      columns: [
-                        ['data1', 20, 30, 440, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                      ],
-                    },
-                    axis: {
-                      y: {
-                        label: {
-                          text: 'Cars',
-                          position: 'outer-middle'
-                        }
-                      },
-                  }
-                });
-            }
         function changeChartData(){
         chart.load({
           columns: [
