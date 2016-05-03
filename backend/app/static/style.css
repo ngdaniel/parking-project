@@ -43,11 +43,82 @@ input {
 }
 
 #map {
-    width: 100%;
-    height: 100%
+    width: 75%;
+    height: 75%;
+    position:absolute;
+    right:0px;
+    top:0px;
+    z-index:99
 }
 
 .directionsBox:hover {
     background-color:blue;
     cursor:pointer;
 }
+
+.divide{
+    border-bottom:1px solid;
+    border-color:#777;
+}
+.stepStats{
+    position:absolute;
+    padding-left:32px;
+    padding-right:4px;
+    z-index:1;
+    top:-10px;
+    display:inline-block;
+    background-color:white;
+    color:#777;
+    
+}
+
+.drivingStepStats{
+    position:relative;
+    padding-bottom:30px;
+    padding-left:40px;
+}
+.drivingInstructions{
+    line-height:30px;
+    font-size:20px;
+    padding-bottom:20px;
+}
+
+.drivingSymbol{
+    float:left;
+    padding-right:20px;
+    height:25px;
+}
+.transportIconHolder{
+    height:inherit;
+}
+#chartContainer{
+   z-index:101;
+   right:0;
+   bottom:0;
+   position:absolute !important;
+   height:25%;
+   width:75%;
+   overflow:hidden;
+}
+
+#chart{
+    height:100% !important;
+    z-index:102;
+}
+
+#lowerChart{
+    display:inherit;
+    position:fixed;
+    z-index:100;
+    left:55%;
+    margin-top:-25px;
+    height:25px;
+    width:10%;
+    -moz-appearance: none;
+     -webkit-appearance: none;
+     appearance: none;
+    background-color:#d3d3d3;
+
+}
+
+

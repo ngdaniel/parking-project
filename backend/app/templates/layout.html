@@ -2,8 +2,14 @@
 
 <title>Urban Parking</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script type="text/javascript"> var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }}; </script>
+<script type="text/javascript"> var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <script type="text/javascript" src="{{ url_for('static', filename='databaseMap.js') }}"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='c3-0.4.11/c3.min.js') }}" charset="utf-8"></script> 
+
 <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAqwnF0OCYJ6IWqWeUBifZpZ7DsI2UOWcI&callback=initMap"></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<!-- Load c3.css -->
+<link href="{{ url_for('static', filename='c3-0.4.11/c3.min.css') }}" rel="stylesheet" type="text/css">
+
 {% block body %}{% endblock %}

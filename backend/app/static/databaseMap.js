@@ -10,7 +10,7 @@ var map;
 //On document creation adds click event handler to forms
 $(function() {
     var directionsService;
-
+    var chart;
     var markersList = [];
     var infoWindowList = [];
     var polylineList = [];
@@ -48,9 +48,22 @@ $(function() {
         },
     });
 
-    map.addListener('click', function(e) {
+     map.addListener('click', function(e) {
         placeMarkerAndFindPayStations(e.latLng, map);
     });
+    
+    
+    makeChart();
+    $("#buttonChart").bind('click',function(){ 
+            console.log("chart");
+            changeChartData();
+       });
+    $("#lowerChart").bind('click',function(){ 
+            console.log("Lowerchart");
+            lowerChart(this);
+       });
+    
+
 
     autoSrc = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirSrc")));
     autoDst = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirDst")));
@@ -134,8 +147,9 @@ $(function() {
                   	var startLocation = {};
                   	var endLocation = {};
                     var routeList = [];
-                    clearDirectionsPanel();
-                    //do route logic here and loop over the route array
+                    clearDirectionsPanel();   
+                    
+                    /////////////////do route logic here and loop over the route array
                     $.each(response.routes, function(index, routeOption){
                         routeList.push(routeOption);
                     });
@@ -146,8 +160,8 @@ $(function() {
                         //Route Summary at the top of the page
                         var $div = $("<div>",{id :"foo", class : "directionsBox"});
                         $div.data("directions",index);
-
-                        //show route information associated when div clicked on
+                 
+                        //show route information associated when div clicked on 
                         $div.click(function(){
                             clearPolyLines();
                             directionsNumber = jQuery(this).data('directions');
@@ -158,22 +172,34 @@ $(function() {
                         $.each(route.legs, function(routeNumber,routeSegment){
                             if (index === 0){
                                 var $fromAndTo = $("<div>");
-                                $fromAndTo.append( routeSegment.start_address + " to ");
-                                $fromAndTo.append( routeSegment.end_address + "<br />");
+                                //TODO: Get the names of address and replace them here
+                                $fromAndTo.append("<span> From:" + routeSegment.start_address + "</span>" );
+                                $fromAndTo.append("<br>" );
+                                $fromAndTo.append("<span> To:" + routeSegment.end_address + "</span>");
+                                $fromAndTo.append("<br>" );
                                 summaryPanel.append($fromAndTo);
                             }
-                            $div.append( "<b>Route: " + (index + 1) +" -  Via:"+ route.summary + " - " + routeSegment.distance.text+' '+ routeSegment.duration.text+ "</b><br />");
+
+                            ////////////////Each Route  Box ///////////////////////////////
+                            
+
+                           $div.append("<img src ="+ $SCRIPT_ROOT + '/static/parkingBlue.png'+" class='transportIcon'>");
+                            $div.append( "<b>Route: " + (index + 1) +" -  Via:"+ route.summary + "</b>");
+                            $div.append("<span>" + routeSegment.distance.text + "</span>");
+                            $div.append("<span>" + routeSegment.duration.text + "</span>");
+                            $div.append("<br />");
+
                         });
+
                         //storing the divs inside an array to mess with later
                         summaryList[index] = $div;
                         summaryPanel.append($div);
+                        summaryPanel.append("<hr>");
 
-
-                        //Pathing
+                        ////////////////////Stitching pollyLine route together////////////////////
                         var path = route.overview_path;
                         var legs = route.legs;
                         var $directions = $("<div>",{id :"foo", class : "fee"});
-                        $directions.append("<ul>");
                         $div.click(function(){
                             //hide the other content
                             //s
@@ -193,28 +219,36 @@ $(function() {
                                  strokeColor: '#FF0000',
                                  strokeOpacity: 1.0,
                                  strokeWeight: 2
-                            });
-                            for (j=0;j<steps.length;j++) {
-                                 var nextSegment = steps[j].path;
-                                 $directions.append( "<li>"+steps[j].instructions);
-                                 var dist_dur = "";
-                                 if (steps[j].distance && steps[j].distance.text) dist_dur += "&nbsp;"+steps[j].distance.text;
-                                 if (steps[j].duration && steps[j].duration.text) dist_dur += "&nbsp;"+steps[j].duration.text;
-                                 if (dist_dur !== "") {
-                                     $directions.append( "("+dist_dur+")<br /></li>");
-                                 } else {
-                                     $directions.append( "</li>");
-                                 }
+                           }); 
+       
 
+                            for (j=0;j<steps.length;j++) {
+                                var nextSegment = steps[j].path;
+                                 
+                            ////////////////Each Driving Step of the Route////////////////////
+                                 var $drivingStep = $("<div>",{class : "drivingStep"}); 
+                                 var $icon = $("<div>",{ class : "transportIconHolder"});
+                                 $icon.append("<img src ="+ $SCRIPT_ROOT + '/static/dot.png'+" class='drivingSymbol'>")
+                                 $drivingStep.append($icon);
+                                 $drivingStep.append( "<div class='drivingInstructions'>"+steps[j].instructions+"</div>");
+                                 if (steps[j].distance && steps[j].distance.text){
+                                    
+                                    var $drivingStepStats = $("<div>",{class : "drivingStepStats"}); 
+                                    $drivingStepStats.append("<div class='divide'></div>")
+                                    $drivingStepStats.append( "<div class ='stepStats'>"+steps[j].duration.text +" ("+ steps[j].distance.text+") "+"</div>");
+                                    $drivingStep.append($drivingStepStats); 
+                               }
+                                 $directions.append($drivingStep);
+                                 
                                  for (k=0;k<nextSegment.length;k++) {
                                      polyline.getPath().push(nextSegment[k]);
                                      bounds.extend(nextSegment[k]);
                                  }
                             }
                         }
-                        $directions.append("</ul>");
-                        detailsList[index] = $directions;
-                        polylineList[index] = polyline;
+                       ///////////////////////////////////////////////////
+                        detailsList[index] = $directions;  
+                        polylineList[index] = polyline; 
                         map.fitBounds(bounds);
                         endLocation.marker = createMarker(endLocation.latlng,"end",endLocation.address,"red");
 
@@ -277,6 +311,8 @@ $(function() {
             var infoWindow = new google.maps.InfoWindow({
                 content: infoWindowContent
             });
+
+
             marker.addListener('mouseover', function() {
                 infoWindow.open(map, marker);
             });
@@ -349,5 +385,82 @@ $(function() {
         markersList.push(cityCircle);
     }
 };
+/*
+        function makeChart(){
+            chart = c3.generate({
+                bindto: '#chart',
+                data: {
+                  columns: [
+                    ['data1', 20, 30, 440, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                  ],
+                transition: {
+                    duration: 100,
+                },
+                types: {
+                    data1: 'bar' // ADD
+                  }
+                },
+                axis: {
+                  y: {
+                    label: {
+                      text: 'Cars',
+                      position: 'outer-middle'
+                    }
+                  },
+              }
+            });
+        }
+*/
+        function makeChart(){
+               chart = c3.generate({
+                    bindto: '#chart',
+                    data: {
+                      columns: [
+                        ['data1', 20, 30, 440, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                      ],
+                    },
+                    axis: {
+                      y: {
+                        label: {
+                          text: 'Cars',
+                          position: 'outer-middle'
+                        }
+                      },
+                  }
+                });
+            }
+        function changeChartData(){
+        chart.load({
+          columns: [
+            ['Pay Station', 300, 100, 250, 150, 300, 150, 500],
+          ],
+          type:'bar'
+        });
+        }
+        function lowerChart(){
+            $("#chartContainer").animate({
+                height:'0%'
+            },{duration:400,queue:false});            
+            $("#map").animate({
+                height:'100%'
+            },{duration:400,queue:false});
+            $("#lowerChart").unbind();
+            $("#lowerChart").bind("click",function(){
+                raiseChart();
+            });
+        }
+        function raiseChart(){
+            $("#chartContainer").animate({
+                height:'25%'
+            },{duration:400,queue:false});            
+            $("#map").animate({
+                height:'75%'
+            },{duration:400,queue:false});
+
+            $("#lowerChart").unbind();
+            $("#lowerChart").bind("click",function(){
+               lowerChart();
+            });
+        }
 
 });
