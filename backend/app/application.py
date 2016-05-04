@@ -94,9 +94,15 @@ def get_transactions():
 def get_densities():
     cur = mysql.connect().cursor()
     at_time = datetime.datetime.fromtimestamp(int(request.args.get('time', int(time.mktime(datetime.datetime.now().timetuple())))))
+    element_keys = request.args.get('element_keys', None)
     start = at_time - datetime.timedelta(hours=24)
-    query = "SELECT element_key, timestamp, duration FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}' order by duration;"
-    cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), at_time.strftime('%Y-%m-%d %H:%M:%S')))
+    query = "SELECT element_key, timestamp, duration FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}'"
+    if element_keys:
+        query += " AND element_key IN ({3}) order by duration;" 
+        cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), at_time.strftime('%Y-%m-%d %H:%M:%S'), ', '.join(element_keys.split())))
+    else:
+        query += " order by duration;"
+        cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), at_time.strftime('%Y-%m-%d %H:%M:%S')))
     transactions = cur.fetchall()
     timeframes = {}
     occupancies = {}
