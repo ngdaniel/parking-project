@@ -14,9 +14,9 @@ $(function() {
     if (thisTime === '') {
       thisTime = "12:00"; // Default time
     }
-		dateParts = thisDate.split('-');
 
     // Hack to fake future data
+		dateParts = thisDate.split('-');
     if (dateParts[0] >= 2016) {
       dateParts[0] = 2015;
     }
@@ -24,7 +24,7 @@ $(function() {
 		date = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1]);
 		timestamp = date.getTime() / 1000; // unix time from date /time entry
 
-		if (!timestamp) {
+		if (thisDate === '') {
 			timestamp = Date.now() / 1000 | 0; // current unix time
 		}
 		// console.log(timestamp);
@@ -59,17 +59,9 @@ $(function() {
 			strokeOpacity: 0.800000,
 			strokeWeight: size
 		});
-		// var infowindow = null
-		// // doesnt work value doesnt update on click
-		// google.maps.event.addListener(mapLine, 'click', function(event) {
-		// var infowindow = new google.maps.InfoWindow({content: value});
-		// 	console.log(value);
-		// 	infowindow.position = event.latLng;
-		//   infowindow.open(map);
-		// });
+
 		mapLine.setMap(map);
 		lineList.push(mapLine);
-		// infoLineList.push(infowindow)
 
 	}
 
@@ -94,16 +86,22 @@ $(function() {
 		});
 	}
 
+	// function timeForcast(time) {
+	// 	$.getJSON($SCRIPT_ROOT + '/densities?time=' + time, function(density_json) {
+	//
+	//
+	// }
+
 	// Parse Occupancy
 	var densities = new Map();
-
 	function showDensities(time) {
 		var total = 0;
 		var n = 0;
 		// Loop through occupancy at given time
 		$.getJSON($SCRIPT_ROOT + '/densities?time=' + time, function(density_json) {
 			$.each(density_json, function(id, data) {
-				var density = parseFloat(JSON.stringify(eval(data)));
+				var density = parseFloat(JSON.stringify(data));
+				// console.log(density);
 				value = JSON.stringify(data) + ' capacity';
 				densities.set(id, density);
 				total += density;
@@ -127,7 +125,7 @@ $(function() {
 						];
 						// scale so red is full, green empty
 						var hue = parseInt(130 * (1 - densities.get(id)));
-						hue = Math.max(0, hue); //TODO wtf, some densities are > 1 thus hue < 0
+						hue = Math.max(0, hue);
 						var color = 'hsl(' + hue + ', 100%, 50%)';
 						var size = data[6] / 1.8;
 						// console.log(densities.get(id) + ' : ' + coords);
