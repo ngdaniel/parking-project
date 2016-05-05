@@ -12,9 +12,10 @@ $(function() {
     var directionsService;
     var chart;
     var markersList = [];
+    var markersHash = [];
     var infoWindowList = [];
     var polylineList = [];
-
+    var payStationList = [];
     var destination = {
         lat: 47.60801,
         lng: -122.335167
@@ -28,7 +29,8 @@ $(function() {
     var searchRadius = parseInt($("#searchRadius").val());
     var detailsPanel = $("#directions_panel");
     var summaryPanel = $("#summary_panel");
-
+    var payStationPanel = $("#payStationSelection");
+    var payStationOptionsPanel = $("#payStationArea");
     $("#curRadius").html(searchRadius);
 
     //Creates map over seattle and adds click dlistener
@@ -49,7 +51,7 @@ $(function() {
     });
 
      map.addListener('click', function(e) {
-        placeMarkerAndFindPayStations(e.latLng, map);
+        placeMarkerAndFindPayStations(e.latLng,map,true);
     });
     
     
@@ -89,7 +91,9 @@ $(function() {
                 return;
             } else {
                 console.log(place);
-                destinationSpot = place.formatted_address;
+                searchedSpot = new google.maps.LatLng( place.geometry.location.lat(), place.geometry.location.lng())
+                placeMarkerAndFindPayStations(searchedSpot,map,true);
+               // destinationSpot = place.formatted_address;
             }
         });
     $('#gps').bind('click', function() {
@@ -116,6 +120,7 @@ $(function() {
     //If they are filled out , then directions will be drawn
     $('#routeToLocation').bind('click', function() {
         clearMap();
+        clearDirectionsPanel();   
         directionsExp(directionsService,originSpot,destinationSpot);
     });
 
@@ -126,7 +131,45 @@ $(function() {
          strokeOpacity: 1.0,
          strokeWeight: 2
     });
+    $('input[type=button]').click(function() {
+       $('input[type=button]').removeClass('active');
+       $(this).addClass('active');
+    });
+    //present the closest paystation to lcation, give cost and average drive time
+    //locations of cheaper ones- show walking distance and time
+    //location of ones that will have less people in it 
+    function showPayStationOptions(){
+       console.log("showPayStationOptions");
+        //cloest
+        var optionsAmount = 3;
+        var close = $("#closestPayStation"); 
+        var cheap = $("#cheapestPayStation");
+        var empty = $("#emptiestPayStation");
+        payStationOptionsPanel.html("");
+        for(i = 0; (i < optionsAmount) && (i  < payStationList.length); i ++){
+           generatePayStationOption(payStationList[i],payStationOptionsPanel);
+        }
+    }
+    function generatePayStationOption(payStationItem,target){
+        
+        var options = $("<div>",{class: "directionsBox"});
+        options.hover(
+            function(){
+                markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingGood.png");
+                //TODO:CHANGE BARCHART DATA
+           },
+            function(){
+                markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingBlue.png");
+            }
+    );
+        options.append("<img src ="+ $SCRIPT_ROOT +" '/static/parkingBlue.png'class='transportIcon'>");
+        options.append("<p> Distance: "+payStationItem[7]+" km far"+"<p>");
+        options.append("<p> estimated: "+"PLACEHOLDERGUESS" +" spots taken out of "+payStationItem[6]  +"</p>");
 
+        target.append(options);
+    }
+    //find paystation that costs the least
+    //find paystation that is emptiest
     function directionsExp(directionsService,originSpot,destSpot){
           directionsService.route({
                 origin: originSpot,
@@ -140,14 +183,14 @@ $(function() {
             },
             function (response, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
-                    console.log(response);
+                    
+                   console.log(response);
                     var bounds = new google.maps.LatLngBounds();
                     var summaryList = [];
                     var detailsList = [];
                   	var startLocation = {};
                   	var endLocation = {};
                     var routeList = [];
-                    clearDirectionsPanel();   
                     
                     /////////////////do route logic here and loop over the route array
                     $.each(response.routes, function(index, routeOption){
@@ -260,7 +303,7 @@ $(function() {
     function createMarker(placement,title,adress,color){
         var marker = new google.maps.Marker({
             position: placement,
-            draggable: true,
+            draggable: false,
             map: map,
             icon:'http://maps.google.com/mapfiles/ms/icons/'+color+'-dot.png'  ,
             title:title
@@ -270,8 +313,9 @@ $(function() {
 
     //Gets data points from library and plots the markers
     //radius is gotten from textBox, default is 250m
-    function placeMarkerAndFindPayStations(latLng, map) {
+    function placeMarkerAndFindPayStations(latLng, map, draw) {
         clearMap();
+        payStationList = [];
         //Queries python API for datapoints
     $.getJSON($SCRIPT_ROOT + '/paystations_in_radius', {
         latitude: latLng.lat,
@@ -279,12 +323,15 @@ $(function() {
         radius: searchRadius/1000
     }, function(data) {
         // console.log(data);
-        markAndCircle(latLng, searchRadius, map);
         //Loop over each datapoint(payStation)
         nearestPayStation = null;
         var nFound = 0;
         $.each(data, function(index) {
-            payStationItem = data[index];
+                
+            nFound++;
+             payStationItem = data[index];
+            payStationItem[8] = index;
+            payStationList.push(payStationItem);
             // console.log(payStationItem);
             idNumber = index;
             meterLat = payStationItem[5];
@@ -299,6 +346,8 @@ $(function() {
                 nearestPayStation = payStationItem;
                 nearestPayStationID = idNumber;
             }
+            
+           if(draw){ 
             //Adds marker and infowindow  + click listners for each payStation
             var marker = new google.maps.Marker({
                 position: new google.maps.LatLng(meterLat, meterLong),
@@ -306,13 +355,12 @@ $(function() {
                 icon: $SCRIPT_ROOT + '/static/parkingBlue.png'
                 //have different colored parking .png files for busy/notbusy/somewhat busy
             });
+
             //TODO: Make a better looking Info window
             infoWindowContent = '<p>Blockface {} has a max capacity {} and is {} m away from destination </p>'.format(idNumber, meterMaxOcc, distance.toFixed(2)*1000);
             var infoWindow = new google.maps.InfoWindow({
                 content: infoWindowContent
             });
-
-
             marker.addListener('mouseover', function() {
                 infoWindow.open(map, marker);
             });
@@ -321,17 +369,30 @@ $(function() {
                     infoWindowList[i].close();
                 }
             });
+            markersHash[payStationItem[8]] = marker;
             markersList.push(marker);
             infoWindowList.push(infoWindow);
-            nFound++;
+           } 
         });
-        destinationSpot = new google.maps.LatLng(nearestPayStation[5],nearestPayStation[4]);
-        console.log("Found " + nFound + " paystations within range");
+       //sort List for distance 
+       payStationList.sort(function(a,b){return a[7]-b[7] });
+       console.log(payStationList);
+        if(nFound != 0 && draw){
+            markAndCircle(latLng, searchRadius, map);
+            console.log("Found " + nFound + " paystations within range");
+            destinationSpot = new google.maps.LatLng(nearestPayStation[5],nearestPayStation[4]);
+            showPayStationOptions();
+       }
+        else{
+            alert('no paystations within radius of click');
+        }
         //console.log(nearestPayStation[4]);
     });
     return false;
     }
+    function lookUpPaystationsInRadius(){
 
+    }
 	// Clears the map of markers
 	function clearMap() {
         //clearLines();
@@ -368,6 +429,7 @@ $(function() {
             position: searchCoord,
             map: map,
         });
+
         var cityCircle = new google.maps.Circle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -377,6 +439,14 @@ $(function() {
             map: map,
             center: searchCoord,
             radius: searchRadius //radius is in meters
+        });
+        var bounds = cityCircle.getBounds();
+        map.fitBounds(bounds);
+
+        marker.addListener('dragend',function(event) {
+            destination.lat = event.latLng.lat();
+            destination.lng = event.latLng.lng();
+           placeMarkerAndFindPayStations(destination,map,true);
         });
         destination.lat = searchCoord.lat;
         destination.lng = searchCoord.lng;
@@ -390,7 +460,7 @@ $(function() {
                 bindto: '#chart',
                 data: {
                   columns: [
-                    ['data1', 20, 30, 440, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    ['PayStation XX', 0, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                   ],
                 transition: {
                     duration: 100,
@@ -406,16 +476,22 @@ $(function() {
                       position: 'outer-middle'
                     }
                   },
+                  x:{
+                    label:{
+                        text: 'Hours',
+                        position: 'outer-middle'
+                    }
+                  },
               }
             });
         }
         function changeChartData(){
-        chart.load({
-          columns: [
-            ['Pay Station', 300, 100, 250, 150, 300, 150, 500],
-          ],
-          type:'bar'
-        });
+            chart.load({
+              columns: [
+                ['Pay Station', 300, 100, 250, 150, 300, 150, 500],
+              ],
+              type:'bar'
+            });
         }
         function lowerChart(){
             $("#chartContainer").animate({

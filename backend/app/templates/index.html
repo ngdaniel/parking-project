@@ -3,13 +3,26 @@
 
     <div id="nav">
         <div id="input">
-          <h2> Parking Web App </h2>
+        <img src="{{url_for('static',filename='logo.png')}}" id="logo" align="middle" ><hr>
           <h3>Navigation</h3>
             <button id="gps">Use GPS </button>
             <input type="text" id="dirSrc" placeholder="Starting point" autocomplete="off">
-            <input type="text" id="dirDst" placeholder="Destination" autocomplete="on"><br>
             Search Radius: <span id="curRadius"></span> Meters <input type="range" id="searchRadius"  min="0" max="1000" value ="250" /> <br>
-            <button id="routeToLocation">Route to best parking location</button>
+            <div id="payStationSelection" >
+                <div id="payStationBox">
+                    <h3>Pay Station Look Up</h3>
+             
+                    <input type="text" id="dirDst" placeholder="Destination" autocomplete="on"><br>
+                    <input type="button" class="active" value="Closest" />
+                    <input type="button" value="Most Available" />
+                    <input type="button" value="Cheapest"disabled />
+                    
+                    <div id="payStationArea">
+                    
+                    </div>
+                </div>
+            </div>
+            <button id="routeToLocation">Route to parking meter</button>
         </div>
 
         <div id="densities">
@@ -22,14 +35,16 @@
           <!-- <br>Epoch: <input type="text" size="20" id="timestamp" value="" placeholder="Default 1455290482" autocomplete="off"><br> -->
           <br><div class="load"><span class="value"></span></div><br>
           <button id="searchTime">Show Parking Load</button><br>
-
         </div>
 
         <!-- Directions -->
-       <div id ="summary_panel"></div>
+        
+       <div id ="summary_panel">
+       </div>
         <div id ="directions_panel"></div>
 
     </div>
+    
     <div id="map"></div>
     <div id="chartContainer">
         <button id="lowerChart"> </button>

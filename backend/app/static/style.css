@@ -44,6 +44,7 @@ input {
 
 #map {
     width: 75%;
+    
     height: 75%;
     position:absolute;
     right:0px;
@@ -121,4 +122,22 @@ input {
 
 }
 
-
+#payStationSelection{
+}
+#payStationArea{
+    min-height:10%;
+    border:2px;
+    height:20%;
+    overflow:scroll;
+}
+#appTitle{
+    text-align:center;
+}
+#logo{
+    margin:auto;
+    display:block;
+    height:15em;
+}
+.active{
+    background:red;
+}
