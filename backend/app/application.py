@@ -98,7 +98,7 @@ def get_densities():
     start = at_time - datetime.timedelta(hours=24)
     query = "SELECT element_key, timestamp, duration FROM transactions WHERE timestamp BETWEEN '{0}' and '{1}'"
     if element_keys:
-        query += " AND element_key IN ({3}) order by duration;" 
+        query += " AND element_key IN ({2}) order by duration;" 
         cur.execute(query.format(start.strftime('%Y-%m-%d %H:%M:%S'), at_time.strftime('%Y-%m-%d %H:%M:%S'), ', '.join(element_keys.split())))
     else:
         query += " order by duration;"
@@ -118,7 +118,7 @@ def get_densities():
             max_occupancy = cur.fetchone()
             if max_occupancy:
                 max_occupancy = max_occupancy[0]
-                densities[key] = str(occupancy) + '/' + str(max_occupancy)
+                densities[key] = float("{0:.3f}".format(occupancy/max_occupancy))
         
     return json.dumps(densities)
         
