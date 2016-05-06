@@ -3,39 +3,43 @@ $(function() {
 	document.getElementById("showLots").onclick = function() {
 		drawPaystations();
 	};
-	var timestamp;
+
 	document.getElementById("searchTime").onclick = function() {
 		$(".load .value").html('<font size="2">Can take up to a minute...</font>');
 		clearLines();
-		var timestamp = $('input[id="timestamp"]').val();
-		thisDate = $('input[id="date"]').val();
-		thisTime = $('input[id="time"]').val();
-    console.log(thisTime);
-    if (thisTime === '') {
-      thisTime = "12:00"; // Default time
-    }
-		dateParts = thisDate.split('-');
-
-    // Hack to fake future data
-    if (dateParts[0] >= 2016) {
-      dateParts[0] = 2015;
-    }
-		timeParts = thisTime.split(':');
-		date = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1]);
-		timestamp = date.getTime() / 1000; // unix time from date /time entry
-
-		if (!timestamp) {
-			timestamp = Date.now() / 1000 | 0; // current unix time
-		}
-		// console.log(timestamp);
-		// document.getElementById("timestamp").value = timestamp;
-		console.log('Selected : ' + thisTime + ' ' + thisDate + ' or ' + timestamp);
-
-		showDensities(timestamp);
+		showDensities(getTimestamp());
 	};
+
 	document.getElementById("clear").onclick = function() {
 		clearLines();
 	};
+
+	// Gets time from input fields and returns unix timestamp
+	function getTimestamp() {
+		var timestamp = $('input[id="timestamp"]').val();
+		thisDate = $('input[id="date"]').val();
+		thisTime = $('input[id="time"]').val();
+		console.log(thisTime);
+
+		// fill empty time and date
+		if (thisDate === '') {
+			thisDate = (new Date()).toISOString().slice(0,10);  // just take current timestamp if no date given
+		}
+		if (thisTime === '') {
+			thisTime = "12:00"; // Default time
+		}
+
+		// Hack to fake future data
+		dateParts = thisDate.split('-');
+		if (dateParts[0] >= 2016) {
+			dateParts[0] = 2015;
+		}
+		timeParts = thisTime.split(':');
+		date = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1]);
+		timestamp = date.getTime() / 1000; // unix time from date /time entry
+		console.log('Selected : ' + timestamp + ' : '+ thisTime + ' ' + thisDate);
+		return timestamp;
+	}
 
 	// Paystation Lines
 
