@@ -167,7 +167,8 @@ $(function() {
                $(this).addClass('selectHover');
                markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingGood.png");
                 //TODO:CHANGE BARCHART DATA
-           },
+                changeChartData(payStationItem[8], false);
+          },
             function(){
                $(this).removeClass('selectHover');
                markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingBlue.png");
@@ -175,6 +176,8 @@ $(function() {
     );
         //TODO:replace class with something more attractive
         options.click(function(){
+
+            changeChartData(payStationItem[8],true);
             $('div.optionsBox').removeClass('active');
             $(this).addClass('active');
             console.log(payStationItem[8]);
@@ -392,6 +395,8 @@ $(function() {
             });
             marker.addListener('mouseover', function() {
                 infoWindow.open(map, marker);
+                changeChartData(payStationItem[8],false);
+                
             });
             marker.addListener('mouseout', function() {
                 for (var i = 0; i < infoWindowList.length; i++) {
@@ -419,9 +424,6 @@ $(function() {
         //console.log(nearestPayStation[4]);
     });
     return false;
-    }
-    function lookUpPaystationsInRadius(){
-
     }
 	// Clears the map of markers
 	function clearMap() {
@@ -515,14 +517,23 @@ $(function() {
               }
             });
         }
-        function changeChartData(){
+
+
+        function changeChartData(payStationId,temp){
+        if(temp){
+            title = 'Pay Station' + payStationId;
+        }else{
+            title = 'Pay Station Hover';
+        }
             chart.load({
               columns: [
-                ['Pay Station', 300, 100, 250, 150, 300, 150, 500],
+                [title,0 , 100, 250, 150, 300, 150, 500],
               ],
               type:'bar'
             });
         }
+
+
         function lowerChart(){
             $("#chartContainer").animate({
                 height:'0%'
@@ -548,5 +559,4 @@ $(function() {
                lowerChart();
             });
         }
-
 });
