@@ -79,6 +79,8 @@ $(function() {
         } else {
             console.log(place);
             originSpot = place.formatted_address;
+             searchedSpot = new google.maps.LatLng( place.geometry.location.lat(), place.geometry.location.lng())
+            createMarker(searchedSpot,'start',originSpot.address,'green')
         }
     });
 
@@ -103,6 +105,7 @@ $(function() {
                 originlng = data.coords.longitude;
                 originSpot = new google.maps.LatLng(originlat,originlng);
                 $("#dirSrc").val(data.coords.latitude + ','+ data.coords.longitude);
+                createMarker(originSpot,'start','gps','green');
             });
         } else {
             alert("Geolocation is not supported by this browser.");
@@ -146,31 +149,56 @@ $(function() {
         var cheap = $("#cheapestPayStation");
         var empty = $("#emptiestPayStation");
         payStationOptionsPanel.html("");
-        for(i = 0; (i < optionsAmount) && (i  < payStationList.length); i ++){
-           generatePayStationOption(payStationList[i],payStationOptionsPanel);
+        if( close.hasClass("active")){
+            for(i = 0; (i < optionsAmount) && (i  < payStationList.length); i ++){
+               generatePayStationOption(payStationList[i],payStationOptionsPanel);
+            }
+        }else if( cheap.hasClass("active")){
+            console.log("show cheapest");
+        }else if(empty.hasClass("active")){
+            console.log("show emptiest");
         }
     }
     function generatePayStationOption(payStationItem,target){
-        
-        var options = $("<div>",{class: "directionsBox"});
+        var options = $("<div>",{class: "optionsBox"});
         options.hover(
             function(){
-                markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingGood.png");
+               
+               $(this).addClass('selectHover');
+               markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingGood.png");
                 //TODO:CHANGE BARCHART DATA
            },
             function(){
-                markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingBlue.png");
+               $(this).removeClass('selectHover');
+               markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingBlue.png");
             }
     );
+        //TODO:replace class with something more attractive
+        options.click(function(){
+            $('div.optionsBox').removeClass('active');
+            $(this).addClass('active');
+            console.log(payStationItem[8]);
+            destinationSpot =  new google.maps.LatLng(payStationItem[5],payStationItem[4]);
+        });
         options.append("<img src ="+ $SCRIPT_ROOT +" '/static/parkingBlue.png'class='transportIcon'>");
         options.append("<p> Distance: "+payStationItem[7]+" km far"+"<p>");
         options.append("<p> estimated: "+"PLACEHOLDERGUESS" +" spots taken out of "+payStationItem[6]  +"</p>");
 
         target.append(options);
     }
+
     //find paystation that costs the least
     //find paystation that is emptiest
     function directionsExp(directionsService,originSpot,destSpot){
+          if(originSpot == null && destSpot == null){
+            alert("missing Starting Location and pay Station destination");
+          }
+          else if(originSpot == null ){
+                alert("missing Starting Location");
+          }
+          else if(destSpot == null){
+                alert("Missing payStation destination");
+          }else{
           directionsService.route({
                 origin: originSpot,
                 destination: destSpot,
@@ -298,6 +326,7 @@ $(function() {
                     });
             } else alert(status);
         });
+        }
     }
 
     function createMarker(placement,title,adress,color){
@@ -377,14 +406,15 @@ $(function() {
        //sort List for distance 
        payStationList.sort(function(a,b){return a[7]-b[7] });
        console.log(payStationList);
-        if(nFound != 0 && draw){
-            markAndCircle(latLng, searchRadius, map);
+        markAndCircle(latLng, searchRadius, map);
+       if(nFound != 0 && draw){
             console.log("Found " + nFound + " paystations within range");
-            destinationSpot = new google.maps.LatLng(nearestPayStation[5],nearestPayStation[4]);
+            //destinationSpot = new google.maps.LatLng(nearestPayStation[5],nearestPayStation[4]);
             showPayStationOptions();
        }
         else{
-            alert('no paystations within radius of click');
+            //alert('No paystations within radius of desired location');
+            payStationOptionsPanel.html("No Paystations within radius of desired Locaiton");  
         }
         //console.log(nearestPayStation[4]);
     });

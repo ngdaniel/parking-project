@@ -141,3 +141,12 @@ input {
 .active{
     background:red;
 }
+
+.payStationSetting{
+    width:30%;
+}
+
+.selectHover{
+    background:green;
+
+}
