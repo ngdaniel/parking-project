@@ -44,7 +44,7 @@ input {
 
 #map {
     width: 75%;
-    
+
     height: 75%;
     position:absolute;
     right:0px;
@@ -53,7 +53,7 @@ input {
 }
 
 .directionsBox:hover {
-    background-color:blue;
+    background-color:#3498db;
     cursor:pointer;
 }
 
@@ -70,7 +70,7 @@ input {
     display:inline-block;
     background-color:white;
     color:#777;
-    
+
 }
 
 .drivingStepStats{
@@ -139,7 +139,7 @@ input {
     height:15em;
 }
 .active{
-    background:red;
+    background:#e74c3c;
 }
 
 .payStationSetting{
@@ -147,6 +147,6 @@ input {
 }
 
 .selectHover{
-    background:green;
+    background:#2ecc71;
 
 }

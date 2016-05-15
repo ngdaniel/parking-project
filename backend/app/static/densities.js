@@ -3,42 +3,51 @@ $(function() {
 	document.getElementById("showLots").onclick = function() {
 		drawPaystations();
 	};
-	var timestamp;
 	document.getElementById("searchTime").onclick = function() {
 		$(".load .value").html('<font size="2">Can take up to a minute...</font>');
 		clearLines();
-		var timestamp = $('input[id="timestamp"]').val();
-		thisDate = $('input[id="date"]').val();
-		thisTime = $('input[id="time"]').val();
-    console.log(thisTime);
-    if (thisTime === '') {
-      thisTime = "12:00"; // Default time
-    }
-
-    // Hack to fake future data
-		dateParts = thisDate.split('-');
-    if (dateParts[0] >= 2016) {
-      dateParts[0] = 2015;
-    }
-		timeParts = thisTime.split(':');
-		date = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1]);
-		timestamp = date.getTime() / 1000; // unix time from date /time entry
-
-		if (thisDate === '') {
-			timestamp = Date.now() / 1000 | 0; // current unix time
-		}
-		// console.log(timestamp);
-		// document.getElementById("timestamp").value = timestamp;
-		console.log('Selected : ' + thisTime + ' ' + thisDate + ' or ' + timestamp);
-
-		showDensities(timestamp);
+		showDensities(getTimestamp());
 	};
+
+	document.getElementById("searchKeyTime").onclick = function() {
+		elm_id = document.getElementById("elm_id").value;
+		timeForcast(getTimestamp(), elm_id);
+	};
+
 	document.getElementById("clear").onclick = function() {
 		clearLines();
 	};
 
-	// Paystation Lines
+	// Gets time from input fields and returns unix timestamp
+	function getTimestamp() {
+		var timestamp = $('input[id="timestamp"]').val();
+		thisDate = $('input[id="date"]').val();
+		thisTime = $('input[id="time"]').val();
+		console.log(thisTime);
 
+		// fill empty time and date
+		if (thisDate === '') {
+			thisDate = (new Date()).toISOString().slice(0, 10); // just take current timestamp if no date given
+		}
+		if (thisTime === '') {
+			thisTime = "12:00"; // Default time
+		}
+
+
+		// Hack to fake future data
+		dateParts = thisDate.split('-');
+		if (dateParts[0] >= 2016) {
+			dateParts[0] = 2015;
+		}
+		timeParts = thisTime.split(':');
+		date = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1]);
+		timestamp = date.getTime() / 1000; // unix time from date /time entry
+		console.log('Selected : ' + timestamp + ' : ' + thisTime + ' ' + thisDate);
+		return timestamp;
+	}
+
+
+	////////////////////////// Paystation Lines
 	// TODO auto fit lines to roads
 	// TODO info text on line hover
 	// TODO speedup density draw
@@ -50,7 +59,7 @@ $(function() {
 	function drawLine(coords, color, size) {
 		// console.log('drawing...weight = ' + size + ' : color = ' + color);
 		var mapLine = new google.maps.Polygon({
-			clickable: true,
+			clickable: false,
 			geodesic: true,
 			fillColor: color,
 			fillOpacity: 0.100000,
@@ -86,14 +95,41 @@ $(function() {
 		});
 	}
 
-	// function timeForcast(time) {
-	// 	$.getJSON($SCRIPT_ROOT + '/densities?time=' + time, function(density_json) {
-	//
-	//
-	// }
+	hourly_dens = new Array(24).fill(0);
+	function timeForcast(time, elm_id) {
+		elm_id = 123942;
+		var d = new Date(time*1000);  // set timestamp (ms) to start of the day
+		d.setMinutes(0);
+		for (i = 0; i < 24; i++) {
+			(function(i) {
+				d.setHours(i);  // incriment an hour
+				time = d.getTime() / 1000;
+				query = '/densities?time=' + time + '&element_keys=' + elm_id;
+				// console.log(i,query);
+				getHour(query, i);
+
+			})(i);
+		}
+	}
+
+	// Returns density for single hour of elm id
+	function getHour(query, i) {
+		$.getJSON($SCRIPT_ROOT + query, function(block_json) {
+			if (Object.keys(block_json).length === 0 && block_json.constructor === Object) {
+				console.log('no data');
+				hourly_dens[i] = 0;
+			}
+			$.each(block_json, function(id, data) {
+					var density = parseFloat(JSON.stringify(data));
+					hourly_dens[i] = density;
+					console.log(i,density,hourly_dens);
+			});
+		});
+	}
 
 	// Parse Occupancy
 	var densities = new Map();
+
 	function showDensities(time) {
 		var total = 0;
 		var n = 0;
@@ -139,12 +175,10 @@ $(function() {
 		});
 	}
 
-    function clearLines(){
-        for (var j = 0; j < lineList.length; j++) {
-            lineList[j].setMap(null);
-        }
+	function clearLines() {
+		for (var j = 0; j < lineList.length; j++) {
+			lineList[j].setMap(null);
+		}
 		lineList = [];
-    }
-
-
+	}
 });

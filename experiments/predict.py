@@ -12,8 +12,8 @@ rcParams['figure.figsize'] = 15, 9
 
 
 # Import pandas dataframe
-def load_data(f, alt_start='', alt_end=''):
-    ts = pd.read_pickle(data_path + f)
+def load_data(path, alt_start='', alt_end=''):
+    ts = pd.read_pickle(path)
     ts = ts.dropna()  # remove nan which are free parking days
     # Set the date range. alt_start/end is optional
     if alt_start is '':
@@ -111,7 +111,7 @@ def main():
     if len(sys.argv) > 1:
         f = sys.argv[1]
 
-    ts = load_data(f, alt_start, alt_end)
+    ts = load_data(data_path + f, alt_start, alt_end)
     X = init_features(ts)  # features considered for prediction
     Y = ts['density']  # variable to predict
 
