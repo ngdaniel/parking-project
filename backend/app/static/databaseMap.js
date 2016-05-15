@@ -171,7 +171,8 @@ $(function() {
 					$(this).addClass('selectHover');
 					markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingGood.png");
 					//TODO:CHANGE BARCHART DATA
-					changeChartData(payStationItem[8], false);
+					timeForcast(getTimestamp(),payStationItem[8],changeChartData, false);
+
 				},
 				function() {
 					$(this).removeClass('selectHover');
@@ -181,7 +182,7 @@ $(function() {
 			//TODO:replace class with something more attractive
 			options.click(function() {
 
-				changeChartData(payStationItem[8], true);
+                timeForcast(getTimestamp(),payStationItem[8],changeChartData,true);
 				$('div.optionsBox').removeClass('active');
 				$(this).addClass('active');
 				console.log(payStationItem[8]);
@@ -409,9 +410,9 @@ $(function() {
 						});
 						marker.addListener('mouseover', function() {
 							infoWindow.open(map, marker);
-							changeChartData(payStationItem[8], false);
+                            timeForcast(getTimestamp(),payStationItem[8],changeChartData, false);
+                        });
 
-						});
 						marker.addListener('mouseout', function() {
 							for (var i = 0; i < infoWindowList.length; i++) {
 								infoWindowList[i].close();
@@ -503,6 +504,8 @@ $(function() {
 		}
 	};
 
+});
+
 	function makeChart() {
 		chart = c3.generate({
 			bindto: '#chart',
@@ -535,16 +538,22 @@ $(function() {
 	}
 
 
-	function changeChartData(payStationId, temp) {
-		if (temp) {
+	function changeChartData(hourData,payStationId, temp) {
+        console.log(hourData);
+        
+        if (temp) {
 			title = 'Pay Station' + payStationId;
 		} else {
 			title = 'Pay Station Hover';
 		}
+        dataArray=[];
+        dataArray[0] = title;
+        dataArray.push.apply(dataArray, hourData);
+       console.log(dataArray); 
 		chart.load({
-			columns: [
-				[title, 0, 100, 250, 150, 300, 150, 500],
-			],
+			columns:[ 
+              dataArray 
+            ],
 			type: 'bar'
 		});
 	}
@@ -588,4 +597,4 @@ $(function() {
 			lowerChart();
 		});
 	}
-});
+

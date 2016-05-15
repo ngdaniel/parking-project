@@ -14,14 +14,15 @@ $(function() {
 		if (elm_id === '') {
 			alert ('Must provide and element id');
 		} else {
-			timeForcast(getTimestamp(), elm_id);
-		}
+			timeForcast(getTimestamp(), elm_id, changeChartData,1);
+        }
 	};
 
 	document.getElementById("clear").onclick = function() {
 		clearLines();
 	};
 
+});
 	// Gets time from input fields and returns unix timestamp
 	function getTimestamp() {
 		var timestamp = $('input[id="timestamp"]').val();
@@ -130,13 +131,16 @@ $(function() {
 
 	// Returns list of densities for a given day and element id
 	var results = [];
-	function timeForcast(time, elm_id) {
-		var hours = hoursInDate(time);
+	function timeForcast(time, elm_id,callback,temp) {
+		results = [];
+        var hours = hoursInDate(time);
 		hours.forEach(function(time) {
 			getDensity(time, elm_id, function(result){
 		    results.push(result);
-		    if(results.length == hours.length) {
+            console.log(results.length + " " + hours.length); //this shows how long it is to load data
+            if(results.length == hours.length) {
 		      console.log('send this data to the graph : ', results);
+              callback(results,elm_id,temp); 
 		    }
 		  });
 		});
@@ -196,4 +200,3 @@ $(function() {
 		}
 		lineList = [];
 	}
-});
