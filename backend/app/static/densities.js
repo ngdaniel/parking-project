@@ -136,7 +136,7 @@ $(function() {
 			getDensity(time, elm_id, function(result){
 		    results.push(result);
 		    if(results.length == hours.length) {
-		      final();
+		      console.log('send this data to the graph : ', results);
 		    }
 		  });
 		});
