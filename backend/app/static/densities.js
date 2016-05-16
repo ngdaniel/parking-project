@@ -95,37 +95,81 @@ $(function() {
 		});
 	}
 
-	hourly_dens = new Array(24).fill(0);
-	function timeForcast(time, elm_id) {
-		elm_id = 123942;
-		var d = new Date(time*1000);  // set timestamp (ms) to start of the day
-		d.setMinutes(0);
-		for (i = 0; i < 24; i++) {
-			(function(i) {
-				d.setHours(i);  // incriment an hour
-				time = d.getTime() / 1000;
-				query = '/densities?time=' + time + '&element_keys=' + elm_id;
-				// console.log(i,query);
-				getHour(query, i);
-
-			})(i);
-		}
-	}
-
-	// Returns density for single hour of elm id
-	function getHour(query, i) {
+	// Gets density for given hour
+	function getHour(time, elm_id, callback) {
+		query = '/densities?time=' + time + '&element_keys=' + elm_id;
 		$.getJSON($SCRIPT_ROOT + query, function(block_json) {
 			if (Object.keys(block_json).length === 0 && block_json.constructor === Object) {
-				console.log('no data');
-				hourly_dens[i] = 0;
+				callback(0);
 			}
 			$.each(block_json, function(id, data) {
-					var density = parseFloat(JSON.stringify(data));
-					hourly_dens[i] = density;
-					console.log(i,density,hourly_dens);
+					callback(parseFloat(JSON.stringify(data)));
 			});
 		});
 	}
+
+	// Tmp final callback
+	function final() { console.log('Done', results); }
+
+	// Returns list of hourly timestamps for the given day
+	function hoursInDate(time) {
+		var hours = [];
+		var d = new Date(time*1000);  // set timestamp (ms) to start of the day
+		d.setMinutes(0);
+		for (var i = 0; i < 24; i++) {
+			d.setHours(i);  // incriment an hour
+			time = d.getTime() / 1000;
+			hours.push(time);
+		}
+		return hours;
+	}
+
+	// Returns list of densities for a given day and element id
+	var results = []
+	function timeForcast(time, elm_id) {
+		elm_id = 123942;
+		var hours = hoursInDate(time);
+		hours.forEach(function(time) {
+			getHour(time, elm_id, function(result){
+		    results.push(result);
+		    if(results.length == hours.length) {
+		      final();
+		    }
+		  })
+		});
+	}
+
+	// var hourly_dens = new Array(24).fill(0);
+	// function timeForcast(time, elm_id) {
+	// 	elm_id = 123942;
+	// 	var d = new Date(time*1000);  // set timestamp (ms) to start of the day
+	// 	d.setMinutes(0);
+	// 	for (i = 0; i < 24; i++) {
+	// 		(function(i) {
+	// 			d.setHours(i);  // incriment an hour
+	// 			time = d.getTime() / 1000;
+	// 			query = '/densities?time=' + time + '&element_keys=' + elm_id;
+	// 			// console.log(i,query);
+	// 			getHour(query, i);
+	//
+	// 		})(i);
+	// 	}
+	// }
+	//
+	// // Returns density for single hour of elm id
+	// function getHour(query, i) {
+	// 	$.getJSON($SCRIPT_ROOT + query, function(block_json) {
+	// 		if (Object.keys(block_json).length === 0 && block_json.constructor === Object) {
+	// 			console.log('no data');
+	// 			hourly_dens[i] = 0;
+	// 		}
+	// 		$.each(block_json, function(id, data) {
+	// 				var density = parseFloat(JSON.stringify(data));
+	// 				hourly_dens[i] = density;
+	// 				console.log(i,density,hourly_dens);
+	// 		});
+	// 	});
+	// }
 
 	// Parse Occupancy
 	var densities = new Map();
