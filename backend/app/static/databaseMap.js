@@ -560,7 +560,7 @@ $(function() {
 
 
 	function lowerChart() {
-		$("#chartContainer").animate({
+		$("#bottomScreen").animate({
 			height: '0%'
 		}, {
 			duration: 400,
@@ -579,7 +579,7 @@ $(function() {
 	}
 
 	function raiseChart() {
-		$("#chartContainer").animate({
+		$("#bottomScreen").animate({
 			height: '25%'
 		}, {
 			duration: 400,

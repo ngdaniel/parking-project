@@ -4,23 +4,39 @@
 	<div id="input">
 		<!-- <img src="{{url_for('static',filename='logo.png')}}" id="logo" align="middle" ><hr> -->
 		<h3>Navigation</h3>
-		<button id="gps">Use GPS </button>
-		<input type="text" id="dirSrc" placeholder="Starting point" autocomplete="off">
-		<div id="payStationSelection">
+        <!--<button id="gps">Use GPS </button>-->
+		
+        <input type="text" id="dirSrc" placeholder="Starting point" autocomplete="off">
+        <input type="image" id="gps" class="icon" src="{{url_for('static',filename='globe.png')}}">
+	
+        <div id="payStationSelection">
 			<div id="payStationBox">
 				<h3>Pay Station Look Up</h3> Search Radius: <span id="curRadius"></span> Meters
 				<input type="range" id="searchRadius" min="0" max="1000" value="250" /><br>
 				<input type="text" id="dirDst" placeholder="Destination" autocomplete="on"><br>
-				<input type="button" id="closestPayStation" class="active payStationSetting" value="Closest" />
-				<input type="button" id="emptiestPayStation" class="payStationSetting" value="Most Available" disabled />
-				<input type="button" id="cheapestPayStation" class="payStationSetting" value="Cheapest" disabled />
-				<div id="payStationArea"></div>
+			    <div class="flexcontainer">
+                    <input type="button" id="closestPayStation" class="active payStationSetting" value="Closest" />
+                    <input type="button" id="emptiestPayStation" class="payStationSetting" value="Most Available" disabled />
+                    <input type="button" id="cheapestPayStation" class="payStationSetting" value="Cheapest" disabled />
+			</div >	
+                <div id="payStationArea"></div>
 			</div>
 		</div>
 		<button id="routeToLocation">Route to parking meter</button>
 	</div>
 
-	<div id="densities">
+
+
+	<!-- Directions -->
+	<div id="summary_panel"></div>
+	<div id="directions_panel"></div>
+</div>
+
+<div id="map"></div>
+<div id="bottomScreen">
+
+        <button id="lowerChart"> </button>
+    <div id="densities">
 		<script type="text/javascript" src="{{ url_for('static', filename='densities.js') }}">
 		</script>
 		<h3>Parking Load </h3>
@@ -33,15 +49,9 @@
 		<button id="searchKeyTime">Forcast</button>
 		<input type="text" id="elm_id" placeholder="Element id" autocomplete="on">
 	</div>
-
-	<!-- Directions -->
-	<div id="summary_panel"></div>
-	<div id="directions_panel"></div>
-</div>
-
-<div id="map"></div>
-<div id="chartContainer">
-	<button id="lowerChart"> </button>
+    <div id="chartContainer">
 	<div id="chart"><div>
 </div>
-		{% endblock %}
+	
+<div>
+	{% endblock %}
