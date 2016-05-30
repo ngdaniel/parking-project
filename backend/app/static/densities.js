@@ -14,14 +14,14 @@ $(function() {
 		if (elm_id === '') {
 			alert ('Must provide and element id');
 		} else {
-			timeForcast(getTimestamp(), elm_id);
+			timeForcast(getTimestamp(), elm_id,function(){},false);
 		}
 	};
 
 	document.getElementById("clear").onclick = function() {
 		clearLines();
 	};
-
+});
 	// Gets time from input fields and returns unix timestamp
 	function getTimestamp() {
 		var timestamp = $('input[id="timestamp"]').val();
@@ -129,18 +129,7 @@ $(function() {
 	}
 
 	// Returns list of densities for a given day and element id
-	var results = [];
-	function timeForcast(time, elm_id) {
-		var hours = hoursInDate(time);
-		hours.forEach(function(time) {
-			getDensity(time, elm_id, function(result){
-		    results.push(result);
-		    if(results.length == hours.length) {
-		      console.log('send this data to the graph : ', results);
-		    }
-		  });
-		});
-	}
+
 
 	// Parse Occupancy
 	var densities = new Map();
@@ -160,7 +149,7 @@ $(function() {
 			});
 			var elm_ids = Array.from(densities.keys());
 
-			// draw line colored based off density
+			// draw line co;lored based off density
 			if (elm_ids.length > 0) {
 				url = $SCRIPT_ROOT + "/paystations?element_keys=" + elm_ids.join('%20');
 				// console.log(url);
@@ -196,4 +185,17 @@ $(function() {
 		}
 		lineList = [];
 	}
-});
+
+	function timeForcast(time, elm_id,callback,hover) {
+		var hours = hoursInDate(time);
+	    var results = [];
+        hours.forEach(function(time) {
+			getDensity(time, elm_id, function(result){
+		    results.push(result);
+		    if(results.length == hours.length) {
+		      console.log('send this data to the graph : ', results);
+              callback(results,elm_id,hover)
+          }
+		  });
+		});
+	}
