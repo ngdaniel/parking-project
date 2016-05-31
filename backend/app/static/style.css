@@ -148,5 +148,15 @@ input {
 
 .selectHover{
     background:#2ecc71;
+}
 
+.optionsBox p {
+    margin:0;
+    display:block;
+}
+.optionsTextContainer {
+    padding-left:50px;
+}
+.transportIcon{
+    float:left;
 }

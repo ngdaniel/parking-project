@@ -186,14 +186,21 @@ $(function() {
 			//	changeChartData(payStationItem[8], false);
 				$('div.optionsBox').removeClass('active');
 				$(this).addClass('active');
-				console.log(payStationItem[8]);
 				destinationSpot = new google.maps.LatLng(payStationItem[5], payStationItem[4]);
 			});
-			options.append("<img src =" + $SCRIPT_ROOT + " '/static/parkingBlue.png'class='transportIcon'>");
-			options.append("<p> Distance: " + payStationItem[7] + " km far" + "<p>");
-			options.append("<p> estimated: " + "PLACEHOLDERGUESS" + " spots taken out of " + payStationItem[6] + "</p>");
-
-			target.append(options);
+            getDensity(getTimestamp(),payStationItem[8],function(data){
+                options.append("<img src =" + $SCRIPT_ROOT + " '/static/parkingBlue.png'class='transportIcon'>");
+                
+                var optionsText = $("<div>",{
+                    class:"optionsTextContainer"
+                }); 
+                optionsText.append("<p> Distance: " + (payStationItem[7]*1000).toFixed(1)  + " m" + "</p>");
+                //optionsText.append("<br>");
+                optionsText.append("<p> Density: " + parseFloat(JSON.stringify(data)) + "</p>");
+                options.append(optionsText); 
+                target.append(options);
+            })
+			//options.append("<p> Density: " + blockDensity + "</p>");
 		}
 
 		//find paystation that costs the least
