@@ -261,9 +261,9 @@ $(function() {
 									if (index === 0) {
 										var $fromAndTo = $("<div>");
 										//TODO: Get the names of address and replace them here
-										$fromAndTo.append("<span> From:" + routeSegment.start_address + "</span>");
+										$fromAndTo.append("<span> From: " + routeSegment.start_address + "</span>");
 										$fromAndTo.append("<br>");
-										$fromAndTo.append("<span> To:" + routeSegment.end_address + "</span>");
+										$fromAndTo.append("<span> To: " + routeSegment.end_address + "</span>");
 										$fromAndTo.append("<br>");
 										summaryPanel.append($fromAndTo);
 									}

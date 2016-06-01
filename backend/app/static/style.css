@@ -80,14 +80,15 @@ input {
 }
 .drivingInstructions{
     line-height:30px;
-    font-size:20px;
-    padding-bottom:20px;
+    font-size:15px;
+    padding-bottom:5px;
 }
 
 .drivingSymbol{
     float:left;
     padding-right:20px;
-    height:25px;
+    height: 15px;
+    margin-top: .5em;
 }
 .transportIconHolder{
     height:inherit;
