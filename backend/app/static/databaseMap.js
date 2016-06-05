@@ -261,9 +261,9 @@ $(function() {
 									if (index === 0) {
 										var $fromAndTo = $("<div>");
 										//TODO: Get the names of address and replace them here
-										$fromAndTo.append("<span> From: " + routeSegment.start_address + "</span>");
+										$fromAndTo.append("<span> <strong>From:</strong> " + routeSegment.start_address + "</span>");
 										$fromAndTo.append("<br>");
-										$fromAndTo.append("<span> To: " + routeSegment.end_address + "</span>");
+										$fromAndTo.append("<span> <strong>To:</strong> " + routeSegment.end_address + "</span>");
 										$fromAndTo.append("<br>");
 										summaryPanel.append($fromAndTo);
 									}
@@ -273,8 +273,9 @@ $(function() {
 
 									$div.append("<img src =" + $SCRIPT_ROOT + '/static/parkingBlue.png' + " class='transportIcon'>");
 									$div.append("<b>Route: " + (index + 1) + " -  Via:" + route.summary + "</b>");
-									$div.append("<span>" + routeSegment.distance.text + "</span>");
-									$div.append("<span>" + routeSegment.duration.text + "</span>");
+									$div.append("<br>");
+									$div.append("<span>" + routeSegment.distance.text + " </span>");
+									$div.append("<span>" + routeSegment.duration.text + " </span>");
 									$div.append("<br />");
 
 								});

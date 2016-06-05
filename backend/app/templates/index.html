@@ -20,7 +20,10 @@
 		<button id="routeToLocation">Route to parking meter</button>
 	</div>
 
-	<div id="densities">
+		<!-- Directions -->
+	<div id="summary_panel"></div>
+	<div id="directions_panel"></div>
+<div id="densities">
 		<script type="text/javascript" src="{{ url_for('static', filename='densities.js') }}">
 		</script>
 		<h3>Parking Load </h3>
@@ -33,11 +36,7 @@
 		<button id="searchKeyTime">Forcast</button>
 		<input type="text" id="elm_id" placeholder="Element id" autocomplete="on">
 	</div>
-<form>
-</form>
-	<!-- Directions -->
-	<div id="summary_panel"></div>
-	<div id="directions_panel"></div>
+
 </div>
 
 <div id="map"></div>
