@@ -1,4 +1,5 @@
 $(function() {
+	// Get user inputs from fron end
 	$(".load .value").html('<font size="2">Choose date and time</font>');
 	document.getElementById("showLots").onclick = function() {
 		drawPaystations();
@@ -51,7 +52,7 @@ $(function() {
 	}
 
 
-	////////////////////////// Paystation Lines
+	////////////////////////// Draw Paystation Lines
 	// TODO auto fit lines to roads
 	// TODO info text on line hover
 	// TODO speedup density draw
@@ -185,7 +186,8 @@ $(function() {
 		}
 		lineList = [];
 	}
-
+	
+	// Forcasts data for histogram
 	function timeForcast(time, elm_id,callback,hover) {
 		var hours = hoursInDate(time);
 	    var results = [];
