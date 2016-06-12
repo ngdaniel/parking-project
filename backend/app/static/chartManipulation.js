@@ -1,7 +1,7 @@
 //This file contains functions to manipulate the c3 chartt
 
 
-
+//creates an bar chart to represent density vs hours
 function makeChart() {
 		chart = c3.generate({
 			bindto: '#chart',
@@ -33,7 +33,8 @@ function makeChart() {
 		});
 	}
 
-
+    //changes data to the chart if new 'paystationID' otherwise
+    //add new dataset
 	function changeChartData(plotData,payStationId, hover) {
         if (hover) {
 			title = 'Pay Station' + payStationId;
@@ -42,7 +43,6 @@ function makeChart() {
 		}
         var dataArray=[];
         dataArray[0]=title;
-        //dataArray.concat(plotData);
         dataArray.push.apply(dataArray, plotData);
         console.log(dataArray);
 		chart.load({
@@ -53,7 +53,7 @@ function makeChart() {
 		});
 	}
 
-
+    //Lowers the container with the chart and adds on click handler for raising the chart
 	function lowerChart() {
 		$("#chartContainer").animate({
 			height: '0%'
@@ -72,7 +72,7 @@ function makeChart() {
 			raiseChart();
 		});
 	}
-
+    //raises the container with the chart and adds the on click handler for lowering the chart
 	function raiseChart() {
 		$("#chartContainer").animate({
 			height: '25%'

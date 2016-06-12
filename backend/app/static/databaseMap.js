@@ -49,28 +49,23 @@ $(function() {
 				position: google.maps.ControlPosition.TOP_RIGHT
 			},
 		});
-
+        //clicking on map creates markers and circle on the map
 		map.addListener('click', function(e) {
 			placeMarkerAndFindPayStations(e.latLng, map, true);
 		});
-
-
+        //creates chart and adds the functionality to lower the chart
 		makeChart();
-		$("#buttonChart").bind('click', function() {
-			console.log("chart");
-			changeChartData();
-		});
-		$("#lowerChart").bind('click', function() {
+        $("#lowerChart").bind('click', function() {
 			console.log("Lowerchart");
 			lowerChart(this);
 		});
 
 
-
+        //Adds gooogle autocomplete forms to destination and source forms
 		autoSrc = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirSrc")));
 		autoDst = new google.maps.places.Autocomplete( /** @type {!HTMLInputElement} */ (document.getElementById("dirDst")));
 
-		//Grab location from Source Auto Search when changed
+		//Grab location from Source Auto Search and add a marker.
 		autoSrc.addListener('place_changed', function() {
 			var place = autoSrc.getPlace();
 			if (!place.geometry) {
@@ -85,7 +80,7 @@ $(function() {
 		});
 
 
-		//Grab location from Destination Auto Search when changed
+		//Grab location from Destination Auto Search when changed and draws a circle around the point for paystation
 		autoDst.addListener('place_changed', function() {
 			var place = autoDst.getPlace();
 			if (!place.geometry) {
@@ -98,6 +93,8 @@ $(function() {
 				// destinationSpot = place.formatted_address;
 			}
 		});
+
+        //button asks users if they can use gps coordinates for their stating location and creates a marker location.
 		$('#gps').bind('click', function() {
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(function(data) {
@@ -113,6 +110,7 @@ $(function() {
 			return false;
 		});
 
+        //uses the slider input for search radius of paystations
 		$("#searchRadius").change(function() {
 			searchRadius = parseInt($(this).val());
 			$("#curRadius").html(searchRadius);
@@ -134,14 +132,19 @@ $(function() {
 			strokeOpacity: 1.0,
 			strokeWeight: 2
 		});
-		$('input[type=button]').click(function() {
+
+
+
+        //This function  highlights whichever paystation preference(closest,cheapest,most available) is clicked
+        //present the closest paystation to lcation, give cost and average drive time
+		//locations of cheaper ones- show walking distance and time
+		//location of ones that will have less people in it
+	
+        $('input[type=button]').click(function() {
 			$('input[type=button]').removeClass('active');
 			$(this).addClass('active');
 		});
-		//present the closest paystation to lcation, give cost and average drive time
-		//locations of cheaper ones- show walking distance and time
-		//location of ones that will have less people in it
-		function showPayStationOptions() {
+        function showPayStationOptions() {
 			console.log("showPayStationOptions");
 			//cloest
 			var optionsAmount = 3;
@@ -161,6 +164,7 @@ $(function() {
 			}
 		}
 
+        //adds directions to the directions summary and adds hover commands that will change the  density chart 
 		function generatePayStationOption(payStationItem, target) {
 			var options = $("<div>", {
 				class: "optionsBox"
@@ -170,7 +174,6 @@ $(function() {
 
 					$(this).addClass('selectHover');
 					markersHash[payStationItem[8]].setIcon($SCRIPT_ROOT + "static/parkingGood.png");
-					//TODO:CHANGE BARCHART DATA
 					timeForcast(getTimestamp(),payStationItem[8],changeChartData,false);
                     //changeChartData(payStationItem[8], false);
 				},
@@ -203,9 +206,9 @@ $(function() {
 			//options.append("<p> Density: " + blockDensity + "</p>");
 		}
 
-		//find paystation that costs the least
-		//find paystation that is emptiest
-		function directionsExp(directionsService, originSpot, destSpot) {
+		//Takes the google maps service, origin and destination in google maps latlng object and routes
+        //to the deestination, draws the line on the map and styles the direction in  a list
+        function directionsExp(directionsService, originSpot, destSpot) {
 			if (originSpot === null && destSpot === null) {
 				alert("missing Starting Location and pay Station destination");
 			} else if (originSpot === null) {
@@ -213,6 +216,7 @@ $(function() {
 			} else if (destSpot === null) {
 				alert("Missing payStation destination");
 			} else {
+                //TODO:DO travelmode bus and compare them to offer any faster/cheaper/closer options.
 				directionsService.route({
 						origin: originSpot,
 						destination: destSpot,
@@ -269,8 +273,6 @@ $(function() {
 									}
 
 									////////////////Each Route  Box ///////////////////////////////
-
-
 									$div.append("<img src =" + $SCRIPT_ROOT + '/static/parkingBlue.png' + " class='transportIcon'>");
 									$div.append("<b>Route: " + (index + 1) + " -  Via:" + route.summary + "</b>");
 									$div.append("<br>");
@@ -279,8 +281,7 @@ $(function() {
 									$div.append("<br />");
 
 								});
-
-								//storing the divs inside an array to mess with later
+								//storing the divs inside an array to have acess with later
 								summaryList[index] = $div;
 								summaryPanel.append($div);
 								summaryPanel.append("<hr>");
@@ -294,8 +295,8 @@ $(function() {
 								});
 								$div.click(function() {
 									//hide the other content
-									//s
 								});
+                            
 								for (i = 0; i < legs.length; i++) {
 									if (i === 0) {
 										startLocation.latlng = legs[i].start_location;
@@ -312,7 +313,7 @@ $(function() {
 										strokeOpacity: 1.0,
 										strokeWeight: 2
 									});
-
+                                    ///////////////////////////////////////////////////
 
 									for (j = 0; j < steps.length; j++) {
 										var nextSegment = steps[j].path;
@@ -355,7 +356,7 @@ $(function() {
 					});
 			}
 		}
-
+        //takes lat lng object, marker description, and color and creates a marker on the map 
 		function createMarker(placement, title, adress, color) {
 			var marker = new google.maps.Marker({
 				position: placement,
@@ -451,7 +452,7 @@ $(function() {
 			});
 			return false;
 		}
-		// Clears the map of markers
+		// Clears the map of everything
 		function clearMap() {
 			//clearLines();
 			clearMarkers();
@@ -460,19 +461,19 @@ $(function() {
 			infoWindowList = [];
 		}
 
-		// Make directions empty again
+		// Make directions panel  empty again
 		function clearDirectionsPanel() {
 			summaryPanel.html('');
 			detailsPanel.html('');
 		}
-
+        //clear the map of markers
 		function clearMarkers() {
 			for (var i = 0; i < markersList.length; i++) {
 				markersList[i].setMap(null);
 			}
 			markersList = [];
 		}
-
+        //clears lines of polylines
 		function clearPolyLines() {
 			for (var j = 0; j < polylineList.length; j++) {
 				polylineList[j].setMap(null);
